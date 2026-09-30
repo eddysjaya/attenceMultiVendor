@@ -1,0 +1,16 @@
+target/
+*.class
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+.DS_Store
+
+# SDK vendor berlisensi dan rahasia tidak pernah masuk repositori
+vendor-sdk/
+*.so
+*.dll
+.env
+*.env

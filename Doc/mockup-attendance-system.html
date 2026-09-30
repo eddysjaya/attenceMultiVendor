@@ -1,0 +1,1966 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistem Absensi Multi-Vendor — Mockup UI</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  body { font-family: 'Inter', sans-serif; }
+  .nav-item { transition: all 0.2s; }
+  .nav-item:hover { background: rgba(59,130,246,0.08); }
+  .nav-item.active { background: rgba(59,130,246,0.12); color: #2563eb; border-right: 3px solid #2563eb; }
+  .page { display: none; }
+  .page.active { display: block; }
+  .card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid #e5e7eb; }
+  .badge { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 9999px; font-size: 12px; font-weight: 500; }
+  .badge-green { background: #dcfce7; color: #166534; }
+  .badge-red { background: #fef2f2; color: #991b1b; }
+  .badge-yellow { background: #fefce8; color: #854d0e; }
+  .badge-blue { background: #dbeafe; color: #1e40af; }
+  .badge-gray { background: #f3f4f6; color: #374151; }
+  .badge-purple { background: #f3e8ff; color: #6b21a8; }
+  .stat-card { transition: transform 0.15s; }
+  .stat-card:hover { transform: translateY(-2px); }
+  .vendor-zk { border-left: 4px solid #10b981; }
+  .vendor-hik { border-left: 4px solid #3b82f6; }
+  .vendor-dahua { border-left: 4px solid #f59e0b; }
+  .table-row:hover { background: #f8fafc; }
+  .modal-overlay { background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); }
+  input, select, textarea { transition: border-color 0.15s; }
+  input:focus, select:focus, textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); outline: none; }
+  .progress-bar { transition: width 0.8s ease; }
+  .tab-btn { transition: all 0.15s; }
+  .tab-btn.active { color: #2563eb; border-bottom: 2px solid #2563eb; }
+  .timeline-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 0 2px #d1d5db; }
+  .sync-pulse { animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+</style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+<!-- Layout -->
+<div class="flex h-screen overflow-hidden">
+
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0">
+    <div class="p-5 border-b border-gray-100">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <div>
+          <h1 class="text-sm font-bold text-gray-900">AttendPro</h1>
+          <p class="text-[11px] text-gray-400">Multi-Vendor Attendance</p>
+        </div>
+      </div>
+    </div>
+
+    <nav class="flex-1 py-3 overflow-y-auto">
+      <div class="px-3 mb-2"><span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Utama</span></div>
+      <a onclick="showPage('dashboard')" class="nav-item active flex items-center gap-3 px-4 py-2.5 text-sm cursor-pointer" id="nav-dashboard">
+        <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        Dashboard
+      </a>
+
+      <div class="px-3 mt-4 mb-2"><span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Perangkat</span></div>
+      <a onclick="showPage('devices')" class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm cursor-pointer" id="nav-devices">
+        <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/></svg>
+        Koneksi Alat
+      </a>
+      <a onclick="showPage('checkpoints')" class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm cursor-pointer" id="nav-checkpoints">
+        <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/></svg>
+        Checkpoint & Doorlock
+      </a>
+
+      <div class="px-3 mt-4 mb-2"><span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Karyawan</span></div>
+      <a onclick="showPage('employees')" class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm cursor-pointer" id="nav-employees">
+        <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Daftar Karyawan
+      </a>
+      <a onclick="showPage('enrollment')" class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm cursor-pointer" id="nav-enrollment">
+        <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+        Pendaftaran Wajah
+      </a>
+      <a onclick="showPage('sync')" class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm cursor-pointer" id="nav-sync">
+        <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        Sinkronisasi
+      </a>
+
+      <div class="px-3 mt-4 mb-2"><span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Jadwal</span></div>
+      <a onclick="showPage('schedule')" class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm cursor-pointer" id="nav-schedule">
+        <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        Jadwal Kerja
+      </a>
+      <a onclick="showPage('overtime')" class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm cursor-pointer" id="nav-overtime">
+        <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Lembur
+      </a>
+
+      <div class="px-3 mt-4 mb-2"><span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Laporan</span></div>
+      <a onclick="showPage('reports')" class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm cursor-pointer" id="nav-reports">
+        <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        Laporan Absensi
+      </a>
+      <a onclick="showPage('payroll')" class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm cursor-pointer" id="nav-payroll">
+        <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+        Ekspor Payroll
+      </a>
+      <a onclick="showPage('exceptions')" class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm cursor-pointer" id="nav-exceptions">
+        <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+        Exception Queue
+        <span class="ml-auto badge badge-red">12</span>
+      </a>
+    </nav>
+
+    <div class="p-4 border-t border-gray-100">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 text-xs font-semibold">ES</div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium truncate">Eddy S</p>
+          <p class="text-[11px] text-gray-400">attendance_admin</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 overflow-y-auto">
+
+    <!-- ==================== DASHBOARD ==================== -->
+    <div id="page-dashboard" class="page active p-6">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-xl font-bold">Dashboard</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Ringkasan sistem absensi — Situs Jakarta Pusat</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <select class="text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white">
+            <option>Jakarta Pusat (WIB)</option>
+            <option>Surabaya (WIB)</option>
+            <option>Makassar (WITA)</option>
+          </select>
+          <span class="text-sm text-gray-400">30 Sep 2026, 08:15 WIB</span>
+        </div>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="grid grid-cols-5 gap-4 mb-6">
+        <div class="card p-4 stat-card">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs text-gray-500 font-medium">Karyawan Aktif</span>
+            <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+              <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold">248</p>
+          <p class="text-xs text-gray-400 mt-1">di 3 situs</p>
+        </div>
+        <div class="card p-4 stat-card">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs text-gray-500 font-medium">Perangkat Online</span>
+            <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center">
+              <svg class="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-green-600">42<span class="text-sm text-gray-400 font-normal">/45</span></p>
+          <p class="text-xs text-gray-400 mt-1">3 offline &gt; 15 menit</p>
+        </div>
+        <div class="card p-4 stat-card">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs text-gray-500 font-medium">Punch Hari Ini</span>
+            <div class="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center">
+              <svg class="w-4 h-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold">1,847</p>
+          <p class="text-xs text-gray-400 mt-1">peak 18 punch/s pukul 07:58</p>
+        </div>
+        <div class="card p-4 stat-card">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs text-gray-500 font-medium">Sesi Terbuka</span>
+            <div class="w-8 h-8 bg-yellow-50 rounded-lg flex items-center justify-center">
+              <svg class="w-4 h-4 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-yellow-600">186</p>
+          <p class="text-xs text-gray-400 mt-1">menunggu punch OUT</p>
+        </div>
+        <div class="card p-4 stat-card">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs text-gray-500 font-medium">Exception</span>
+            <div class="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center">
+              <svg class="w-4 h-4 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-red-600">12</p>
+          <p class="text-xs text-gray-400 mt-1">5 error, 7 warning</p>
+        </div>
+      </div>
+
+      <!-- Vendor Distribution + Live Feed -->
+      <div class="grid grid-cols-3 gap-4 mb-6">
+        <div class="card p-5">
+          <h3 class="text-sm font-semibold mb-4">Distribusi Perangkat per Vendor</h3>
+          <div class="space-y-3">
+            <div>
+              <div class="flex justify-between text-xs mb-1"><span class="text-gray-600">ZKTeco (iClock PUSH)</span><span class="font-semibold">22</span></div>
+              <div class="h-2 bg-gray-100 rounded-full"><div class="h-2 bg-emerald-500 rounded-full" style="width:49%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs mb-1"><span class="text-gray-600">Hikvision (ISAPI)</span><span class="font-semibold">15</span></div>
+              <div class="h-2 bg-gray-100 rounded-full"><div class="h-2 bg-blue-500 rounded-full" style="width:33%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs mb-1"><span class="text-gray-600">Dahua (CGI)</span><span class="font-semibold">8</span></div>
+              <div class="h-2 bg-gray-100 rounded-full"><div class="h-2 bg-amber-500 rounded-full" style="width:18%"></div></div>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-gray-100">
+            <div class="flex justify-between text-xs">
+              <span class="text-gray-500">Pull enabled</span>
+              <span class="font-medium">18 / 45</span>
+            </div>
+            <div class="flex justify-between text-xs mt-1">
+              <span class="text-gray-500">Face recognition</span>
+              <span class="font-medium">38 / 45</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card p-5 col-span-2">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-semibold">Punch Feed Terkini</h3>
+            <span class="badge badge-green sync-pulse">Live</span>
+          </div>
+          <div class="space-y-2 text-xs">
+            <div class="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
+              <span class="text-gray-400 w-16">08:14:32</span>
+              <span class="badge badge-green">IN</span>
+              <span class="font-medium flex-1">Ahmad Rizaldi</span>
+              <span class="badge badge-gray">face</span>
+              <span class="text-gray-500">ZK-SpeedFace-V5L #SN2847</span>
+              <span class="text-gray-400">Lobby Utama</span>
+            </div>
+            <div class="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
+              <span class="text-gray-400 w-16">08:14:18</span>
+              <span class="badge badge-green">IN</span>
+              <span class="font-medium flex-1">Siti Nurhaliza</span>
+              <span class="badge badge-gray">face</span>
+              <span class="text-gray-500">HIK-DS-K1T673 #SN9102</span>
+              <span class="text-gray-400">Pintu Belakang</span>
+            </div>
+            <div class="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
+              <span class="text-gray-400 w-16">08:13:55</span>
+              <span class="badge badge-green">IN</span>
+              <span class="font-medium flex-1">Budi Santoso</span>
+              <span class="badge badge-gray">card</span>
+              <span class="text-gray-500">DH-ASI7213Y #SN5501</span>
+              <span class="text-gray-400">Gate Parkir</span>
+            </div>
+            <div class="flex items-center gap-3 p-2 bg-yellow-50 rounded-lg border border-yellow-100">
+              <span class="text-gray-400 w-16">08:12:40</span>
+              <span class="badge badge-yellow">???</span>
+              <span class="font-medium flex-1 text-yellow-800">PIN 9921 — unresolved_employee</span>
+              <span class="badge badge-gray">face</span>
+              <span class="text-gray-500">ZK-MB460 #SN3310</span>
+              <span class="text-yellow-600">Exception</span>
+            </div>
+            <div class="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
+              <span class="text-gray-400 w-16">08:12:15</span>
+              <span class="badge badge-blue">OUT</span>
+              <span class="font-medium flex-1">Dewi Lestari</span>
+              <span class="badge badge-gray">face</span>
+              <span class="text-gray-500">HIK-DS-K1T341 #SN8870</span>
+              <span class="text-gray-400">Lobby Utama</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Match lag & Exceptions -->
+      <div class="grid grid-cols-2 gap-4">
+        <div class="card p-5">
+          <h3 class="text-sm font-semibold mb-3">Match Lag (p95)</h3>
+          <div class="flex items-end gap-1 h-24 mb-2">
+            <div class="flex-1 bg-green-200 rounded-t" style="height:20%"></div>
+            <div class="flex-1 bg-green-200 rounded-t" style="height:25%"></div>
+            <div class="flex-1 bg-green-200 rounded-t" style="height:35%"></div>
+            <div class="flex-1 bg-green-300 rounded-t" style="height:60%"></div>
+            <div class="flex-1 bg-green-200 rounded-t" style="height:30%"></div>
+            <div class="flex-1 bg-green-200 rounded-t" style="height:22%"></div>
+            <div class="flex-1 bg-green-200 rounded-t" style="height:18%"></div>
+            <div class="flex-1 bg-yellow-300 rounded-t" style="height:85%"></div>
+            <div class="flex-1 bg-green-300 rounded-t" style="height:45%"></div>
+            <div class="flex-1 bg-green-200 rounded-t" style="height:28%"></div>
+            <div class="flex-1 bg-green-200 rounded-t" style="height:20%"></div>
+            <div class="flex-1 bg-green-200 rounded-t" style="height:15%"></div>
+          </div>
+          <div class="flex justify-between text-[10px] text-gray-400">
+            <span>07:00</span><span>07:30</span><span>08:00</span><span>08:15</span>
+          </div>
+          <div class="mt-3 pt-3 border-t border-gray-100 flex items-center gap-4">
+            <div><span class="text-xs text-gray-500">Sekarang:</span> <span class="text-sm font-semibold text-green-600">2.1s</span></div>
+            <div><span class="text-xs text-gray-500">Peak:</span> <span class="text-sm font-semibold text-yellow-600">4.8s</span></div>
+            <div><span class="text-xs text-gray-500">Target:</span> <span class="text-sm text-gray-400">&lt; 5s</span></div>
+          </div>
+        </div>
+
+        <div class="card p-5">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-semibold">Exception Terbuka (Hari Ini)</h3>
+            <a onclick="showPage('exceptions')" class="text-xs text-blue-600 cursor-pointer hover:underline">Lihat semua</a>
+          </div>
+          <div class="space-y-2">
+            <div class="flex items-center justify-between p-2 bg-red-50 rounded-lg">
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 bg-red-500 rounded-full"></div>
+                <span class="text-xs font-medium">missing_out</span>
+              </div>
+              <span class="text-xs text-red-700 font-semibold">5</span>
+            </div>
+            <div class="flex items-center justify-between p-2 bg-red-50 rounded-lg">
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 bg-red-500 rounded-full"></div>
+                <span class="text-xs font-medium">unresolved_employee</span>
+              </div>
+              <span class="text-xs text-red-700 font-semibold">2</span>
+            </div>
+            <div class="flex items-center justify-between p-2 bg-yellow-50 rounded-lg">
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                <span class="text-xs font-medium">daily_ot_cap_exceeded</span>
+              </div>
+              <span class="text-xs text-yellow-700 font-semibold">3</span>
+            </div>
+            <div class="flex items-center justify-between p-2 bg-yellow-50 rounded-lg">
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                <span class="text-xs font-medium">min_rest_violation</span>
+              </div>
+              <span class="text-xs text-yellow-700 font-semibold">1</span>
+            </div>
+            <div class="flex items-center justify-between p-2 bg-blue-50 rounded-lg">
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <span class="text-xs font-medium">ot_without_quota</span>
+              </div>
+              <span class="text-xs text-blue-700 font-semibold">1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== DEVICES ==================== -->
+    <div id="page-devices" class="page p-6">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-xl font-bold">Koneksi Perangkat</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Kelola terminal absensi Dahua, ZKTeco, dan Hikvision</p>
+        </div>
+        <button onclick="document.getElementById('modal-add-device').classList.remove('hidden')" class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Tambah Perangkat
+        </button>
+      </div>
+
+      <!-- Vendor Filter Tabs -->
+      <div class="flex gap-2 mb-4">
+        <button class="tab-btn active px-4 py-2 text-sm font-medium border-b-2 border-transparent">Semua (47)</button>
+        <button class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500">ZKTeco (23)</button>
+        <button class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500">Hikvision (16)</button>
+        <button class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500">Dahua (8)</button>
+      </div>
+
+      <!-- Topology gate banner -->
+      <div class="card p-4 mb-4 bg-yellow-50 border-yellow-200 flex items-start gap-3">
+        <svg class="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01"/></svg>
+        <div class="text-sm text-yellow-800">
+          <strong>1 perangkat di Jakarta Pusat belum diatur arah pintunya (UNKNOWN).</strong>
+          Mode live (<span class="font-mono">matcher_live</span>) situs ini terkunci (<span class="font-mono">409 topology_incomplete</span>) sampai arahnya diisi. Mode shadow tetap berjalan.
+        </div>
+      </div>
+
+      <!-- Device Table -->
+      <div class="card overflow-hidden">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 text-gray-600">
+            <tr>
+              <th class="text-left px-4 py-3 font-medium">Perangkat</th>
+              <th class="text-left px-4 py-3 font-medium">Serial / IP</th>
+              <th class="text-left px-4 py-3 font-medium">Protokol</th>
+              <th class="text-left px-4 py-3 font-medium">Arah Pintu</th>
+              <th class="text-left px-4 py-3 font-medium">Pull</th>
+              <th class="text-left px-4 py-3 font-medium">Status</th>
+              <th class="text-left px-4 py-3 font-medium">Terakhir Terlihat</th>
+              <th class="px-4 py-3"></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr class="table-row vendor-zk">
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-700 text-[10px] font-bold">ZK</div>
+                  <div>
+                    <p class="font-medium">SpeedFace-V5L</p>
+                    <p class="text-xs text-gray-400">Lobby Utama — Checkpoint A</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <p class="font-mono text-xs">SN: CJNB234700284</p>
+                <p class="font-mono text-xs text-gray-400">192.168.1.101</p>
+              </td>
+              <td class="px-4 py-3"><span class="badge badge-green">iClock PUSH</span></td>
+              <td class="px-4 py-3"><span class="badge badge-blue">IN</span></td>
+              <td class="px-4 py-3"><span class="badge badge-green">Aktif</span></td>
+              <td class="px-4 py-3"><div class="flex items-center gap-1.5"><div class="w-2 h-2 bg-green-500 rounded-full"></div><span class="text-green-700 text-xs">Online</span></div></td>
+              <td class="px-4 py-3 text-xs text-gray-400">2 menit lalu</td>
+              <td class="px-4 py-3"><button class="text-gray-400 hover:text-gray-600">...</button></td>
+            </tr>
+            <tr class="table-row vendor-zk">
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-700 text-[10px] font-bold">ZK</div>
+                  <div>
+                    <p class="font-medium">MB460</p>
+                    <p class="text-xs text-gray-400">Lobby Utama — Checkpoint A</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <p class="font-mono text-xs">SN: BKNS193800331</p>
+                <p class="font-mono text-xs text-gray-400">192.168.1.102</p>
+              </td>
+              <td class="px-4 py-3"><span class="badge badge-green">iClock PUSH</span></td>
+              <td class="px-4 py-3"><span class="badge badge-purple">OUT</span></td>
+              <td class="px-4 py-3"><span class="badge badge-gray">Mati</span></td>
+              <td class="px-4 py-3"><div class="flex items-center gap-1.5"><div class="w-2 h-2 bg-green-500 rounded-full"></div><span class="text-green-700 text-xs">Online</span></div></td>
+              <td class="px-4 py-3 text-xs text-gray-400">1 menit lalu</td>
+              <td class="px-4 py-3"><button class="text-gray-400 hover:text-gray-600">...</button></td>
+            </tr>
+            <tr class="table-row vendor-hik">
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-700 text-[10px] font-bold">HIK</div>
+                  <div>
+                    <p class="font-medium">DS-K1T673</p>
+                    <p class="text-xs text-gray-400">Pintu Belakang — Checkpoint B</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <p class="font-mono text-xs">SN: DS-K1T673MWX</p>
+                <p class="font-mono text-xs text-gray-400">192.168.1.201</p>
+              </td>
+              <td class="px-4 py-3"><span class="badge badge-blue">ISAPI HTTP Host</span></td>
+              <td class="px-4 py-3"><span class="badge badge-blue">IN</span></td>
+              <td class="px-4 py-3"><span class="badge badge-green">Aktif</span></td>
+              <td class="px-4 py-3"><div class="flex items-center gap-1.5"><div class="w-2 h-2 bg-green-500 rounded-full"></div><span class="text-green-700 text-xs">Online</span></div></td>
+              <td class="px-4 py-3 text-xs text-gray-400">30 detik lalu</td>
+              <td class="px-4 py-3"><button class="text-gray-400 hover:text-gray-600">...</button></td>
+            </tr>
+            <tr class="table-row vendor-hik">
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-700 text-[10px] font-bold">HIK</div>
+                  <div>
+                    <p class="font-medium">DS-K1T341AMF</p>
+                    <p class="text-xs text-gray-400">Pintu Belakang — Checkpoint B</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <p class="font-mono text-xs">SN: DS-K1T341AMFX</p>
+                <p class="font-mono text-xs text-gray-400">192.168.1.202</p>
+              </td>
+              <td class="px-4 py-3"><span class="badge badge-blue">ISAPI HTTP Host</span></td>
+              <td class="px-4 py-3"><span class="badge badge-purple">OUT</span></td>
+              <td class="px-4 py-3"><span class="badge badge-green">Aktif</span></td>
+              <td class="px-4 py-3"><div class="flex items-center gap-1.5"><div class="w-2 h-2 bg-green-500 rounded-full"></div><span class="text-green-700 text-xs">Online</span></div></td>
+              <td class="px-4 py-3 text-xs text-gray-400">45 detik lalu</td>
+              <td class="px-4 py-3"><button class="text-gray-400 hover:text-gray-600">...</button></td>
+            </tr>
+            <tr class="table-row vendor-dahua">
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center text-amber-700 text-[10px] font-bold">DH</div>
+                  <div>
+                    <p class="font-medium">ASI7213Y-V3</p>
+                    <p class="text-xs text-gray-400">Gate Parkir — Checkpoint C</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <p class="font-mono text-xs">SN: 6L09P8DPAZ00055</p>
+                <p class="font-mono text-xs text-gray-400">192.168.1.150</p>
+              </td>
+              <td class="px-4 py-3"><span class="badge badge-yellow">Dahua CGI</span></td>
+              <td class="px-4 py-3"><span class="badge badge-gray">BOTH</span><p class="text-[10px] text-gray-400 mt-0.5">gabungan &middot; punch terakhir menang</p></td>
+              <td class="px-4 py-3"><span class="badge badge-green">Aktif</span></td>
+              <td class="px-4 py-3"><div class="flex items-center gap-1.5"><div class="w-2 h-2 bg-green-500 rounded-full"></div><span class="text-green-700 text-xs">Online</span></div></td>
+              <td class="px-4 py-3 text-xs text-gray-400">5 menit lalu</td>
+              <td class="px-4 py-3"><button class="text-gray-400 hover:text-gray-600">...</button></td>
+            </tr>
+            <tr class="table-row vendor-hik">
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-700 text-[10px] font-bold">HIK</div>
+                  <div>
+                    <p class="font-medium">DS-K1T671</p>
+                    <p class="text-xs text-gray-400">Pintu Karyawan — Checkpoint E</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <p class="font-mono text-xs">SN: DS-K1T671MFW</p>
+                <p class="font-mono text-xs text-gray-400">192.168.1.210</p>
+              </td>
+              <td class="px-4 py-3"><span class="badge badge-blue">ISAPI HTTP Host</span></td>
+              <td class="px-4 py-3">
+                <span class="badge badge-gray">PER PEMBACA</span>
+                <p class="text-[10px] text-gray-500 mt-0.5 font-mono">R1 &rarr; IN &middot; R2 &rarr; OUT</p>
+              </td>
+              <td class="px-4 py-3"><span class="badge badge-green">Aktif</span></td>
+              <td class="px-4 py-3"><div class="flex items-center gap-1.5"><div class="w-2 h-2 bg-green-500 rounded-full"></div><span class="text-green-700 text-xs">Online</span></div></td>
+              <td class="px-4 py-3 text-xs text-gray-400">20 detik lalu</td>
+              <td class="px-4 py-3"><button class="text-gray-400 hover:text-gray-600">...</button></td>
+            </tr>
+            <tr class="table-row vendor-zk bg-yellow-50">
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-700 text-[10px] font-bold">ZK</div>
+                  <div>
+                    <p class="font-medium">SpeedFace-H5</p>
+                    <p class="text-xs text-gray-400">Kantin — belum komisioning</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <p class="font-mono text-xs">SN: CKQA221900417</p>
+                <p class="font-mono text-xs text-gray-400">192.168.1.120</p>
+              </td>
+              <td class="px-4 py-3"><span class="badge badge-green">iClock PUSH</span></td>
+              <td class="px-4 py-3"><span class="badge badge-yellow">UNKNOWN</span><p class="text-[10px] text-yellow-700 mt-0.5">belum diatur</p></td>
+              <td class="px-4 py-3"><span class="badge badge-gray">Mati</span></td>
+              <td class="px-4 py-3"><div class="flex items-center gap-1.5"><div class="w-2 h-2 bg-green-500 rounded-full"></div><span class="text-green-700 text-xs">Online</span></div></td>
+              <td class="px-4 py-3 text-xs text-gray-400">3 menit lalu</td>
+              <td class="px-4 py-3"><button class="text-blue-600 text-xs hover:underline">Atur arah</button></td>
+            </tr>
+            <tr class="table-row vendor-dahua">
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center text-amber-700 text-[10px] font-bold">DH</div>
+                  <div>
+                    <p class="font-medium">ASI6214J (RPC2)</p>
+                    <p class="text-xs text-gray-400">Lantai 2 — Checkpoint D</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <p class="font-mono text-xs">SN: 7K02R4EQBZ00112</p>
+                <p class="font-mono text-xs text-gray-400">192.168.1.155</p>
+              </td>
+              <td class="px-4 py-3"><span class="badge badge-red">RPC2 (bukan v1)</span></td>
+              <td class="px-4 py-3"><span class="badge badge-blue">IN</span></td>
+              <td class="px-4 py-3"><span class="badge badge-gray">—</span></td>
+              <td class="px-4 py-3"><div class="flex items-center gap-1.5"><div class="w-2 h-2 bg-red-500 rounded-full"></div><span class="text-red-700 text-xs">unsupported_protocol</span></div></td>
+              <td class="px-4 py-3 text-xs text-gray-400">—</td>
+              <td class="px-4 py-3"><button class="text-gray-400 hover:text-gray-600">...</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Add Device Modal -->
+      <div id="modal-add-device" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-overlay">
+        <div class="bg-white rounded-xl shadow-2xl w-[640px] max-h-[90vh] overflow-y-auto">
+          <div class="flex items-center justify-between p-5 border-b">
+            <h3 class="text-lg font-bold">Tambah Perangkat Baru</h3>
+            <button onclick="document.getElementById('modal-add-device').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+          </div>
+          <div class="p-5 space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Vendor</label>
+                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                  <option>ZKTeco</option>
+                  <option>Hikvision</option>
+                  <option>Dahua</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Model</label>
+                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                  <optgroup label="ZKTeco — Face Recognition">
+                    <option>SpeedFace-V5L [TDB]</option>
+                    <option>SpeedFace-H5 [Outdoor]</option>
+                    <option>MB460 [Multi-biometric]</option>
+                    <option>ProFace X [Flagship]</option>
+                    <option>MultiBio 800 [Face+FP+Card]</option>
+                  </optgroup>
+                  <optgroup label="ZKTeco — Fingerprint + Card">
+                    <option>inPulse+ [FP+Palm]</option>
+                    <option>ZK-X7 [FP+Card]</option>
+                  </optgroup>
+                  <optgroup label="Hikvision — Face Recognition">
+                    <option>DS-K1T673 [Face 6.5"]</option>
+                    <option>DS-K1T671 [Face 7"]</option>
+                    <option>DS-K1T341AMF [Face 4.3"]</option>
+                    <option>DS-K1T342MWX [Face Min-Moe]</option>
+                    <option>DS-K1T343EFWX [Face Wide Angle]</option>
+                  </optgroup>
+                  <optgroup label="Hikvision — Card + FP">
+                    <option>DS-K1T804 [FP+Card]</option>
+                  </optgroup>
+                  <optgroup label="Dahua — Face Recognition (CGI)">
+                    <option>ASI7213Y-V3 [Face 7" CGI]</option>
+                    <option>ASI7213X [Face 7" CGI]</option>
+                    <option>ASI3214Y [Face 4.3" CGI]</option>
+                  </optgroup>
+                  <optgroup label="Dahua — Face Recognition (RPC2 — bukan v1)">
+                    <option>ASI6214J [Face RPC2]</option>
+                    <option>ASI6215J [Face RPC2]</option>
+                  </optgroup>
+                </select>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Serial Number</label>
+                <input type="text" placeholder="e.g. CJNB234700284" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">IP Address</label>
+                <input type="text" placeholder="192.168.1.xxx" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Situs</label>
+                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                  <option>Jakarta Pusat</option>
+                  <option>Surabaya</option>
+                  <option>Makassar</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Checkpoint</label>
+                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                  <option>Lobby Utama (Checkpoint A)</option>
+                  <option>Pintu Belakang (Checkpoint B)</option>
+                  <option>Gate Parkir (Checkpoint C)</option>
+                  <option>+ Buat Checkpoint Baru</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Protokol</label>
+                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                  <option>zkteco_iclock (PUSH)</option>
+                  <option>isapi (Hikvision)</option>
+                  <option>dahua_cgi</option>
+                  <option>dahua_rpc2 (bukan v1)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Arah Pintu (default)</label>
+                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                  <option>IN — Pintu masuk</option>
+                  <option>OUT — Pintu keluar</option>
+                  <option>BOTH — Gabungan masuk &amp; pulang</option>
+                  <option>UNKNOWN — Belum diatur</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Timezone</label>
+                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                  <option>Asia/Jakarta (WIB +7)</option>
+                  <option>Asia/Makassar (WITA +8)</option>
+                  <option>Asia/Jayapura (WIT +9)</option>
+                </select>
+              </div>
+            </div>
+            <div class="border border-gray-200 rounded-lg p-4">
+              <div class="flex items-center justify-between mb-2">
+                <label class="text-xs font-medium text-gray-600">Arah per pembaca / channel pintu (opsional)</label>
+                <button class="text-xs text-blue-600 hover:underline">+ Tambah pembaca</button>
+              </div>
+              <p class="text-[11px] text-gray-400 mb-3">Untuk perangkat dengan lebih dari satu pembaca (Hikvision <span class="font-mono">cardReaderNo</span>, channel pintu Dahua). Menimpa arah default untuk pembaca itu.</p>
+              <div class="space-y-2">
+                <div class="flex items-center gap-2">
+                  <input type="text" value="1" class="w-16 border border-gray-300 rounded-lg px-2 py-1.5 text-sm font-mono">
+                  <select class="flex-1 border border-gray-300 rounded-lg px-2 py-1.5 text-sm"><option selected>IN — Pembaca luar</option><option>OUT</option><option>BOTH</option></select>
+                </div>
+                <div class="flex items-center gap-2">
+                  <input type="text" value="2" class="w-16 border border-gray-300 rounded-lg px-2 py-1.5 text-sm font-mono">
+                  <select class="flex-1 border border-gray-300 rounded-lg px-2 py-1.5 text-sm"><option>IN</option><option selected>OUT — Pembaca dalam</option><option>BOTH</option></select>
+                </div>
+              </div>
+              <div class="mt-3 grid grid-cols-3 gap-2 text-[11px]">
+                <div class="p-2 bg-green-50 rounded"><strong class="text-green-800">IN / OUT</strong><p class="text-gray-600">Arah pasti. Punch OUT langsung menutup sesi.</p></div>
+                <div class="p-2 bg-gray-50 rounded"><strong class="text-gray-800">BOTH</strong><p class="text-gray-600">Arah dari jadwal. Pulang = punch terakhir di jendela pulang, final setelah jendela lewat.</p></div>
+                <div class="p-2 bg-yellow-50 rounded"><strong class="text-yellow-800">UNKNOWN</strong><p class="text-gray-600">Hanya selama komisioning. Mengunci mode live situs.</p></div>
+              </div>
+              <p class="text-[11px] text-gray-400 mt-3">Mengubah arah hanya berlaku untuk punch berikutnya. Untuk memperbaiki punch lama, pakai <strong>Koreksi arah historis</strong> di menu perangkat (teraudit, memicu hitung ulang).</p>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Pull Enabled (Reconcile)</label>
+                <div class="flex items-center gap-4 mt-2">
+                  <label class="flex items-center gap-2 text-sm"><input type="radio" name="pull" checked> Tidak</label>
+                  <label class="flex items-center gap-2 text-sm"><input type="radio" name="pull"> Ya — TCP 4370 / ISAPI pull</label>
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Allowlist CIDR</label>
+                <input type="text" placeholder="192.168.1.0/24" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1">Shared Secret Ref (secret store key)</label>
+              <input type="text" placeholder="vault://attendance/device-secrets/SN-xxx" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono">
+              <p class="text-[11px] text-gray-400 mt-1">Rahasia disimpan di secret store, bukan di database.</p>
+            </div>
+            <div class="bg-blue-50 rounded-lg p-3 text-xs text-blue-800">
+              <strong>Komisioning wajib sebelum flag situs dinyalakan:</strong> NTP benar, timezone IANA sesuai, uji 1 karyawan + 1 event nyata, uji offline 10 menit + recovery.
+            </div>
+          </div>
+          <div class="flex justify-end gap-3 p-5 border-t bg-gray-50 rounded-b-xl">
+            <button onclick="document.getElementById('modal-add-device').classList.add('hidden')" class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">Batal</button>
+            <button class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">Simpan Perangkat</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== CHECKPOINTS ==================== -->
+    <div id="page-checkpoints" class="page p-6">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-xl font-bold">Checkpoint & Doorlock</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Topologi Site &rarr; Checkpoint &rarr; Device &rarr; Pembaca. Arah dapat diatur: IN, OUT, atau BOTH (gabungan), boleh campuran.</p>
+        </div>
+        <button class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700">+ Tambah Checkpoint</button>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Checkpoint A -->
+        <div class="card p-5">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-semibold">Checkpoint A — Lobby Utama</h3>
+              <p class="text-xs text-gray-400">Situs: Jakarta Pusat &middot; 2 perangkat (IN + OUT terpisah)</p>
+            </div>
+            <span class="badge badge-green">Aktif</span>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="border border-green-200 bg-green-50 rounded-lg p-4">
+              <div class="flex items-center gap-2 mb-3">
+                <svg class="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+                <span class="text-sm font-semibold text-green-800">PINTU MASUK (IN)</span>
+              </div>
+              <div class="bg-white rounded-lg p-3 flex items-center gap-3">
+                <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-700 text-xs font-bold">ZK</div>
+                <div>
+                  <p class="text-sm font-medium">SpeedFace-V5L</p>
+                  <p class="text-xs text-gray-400">Face Recognition &middot; 5" Touch</p>
+                  <p class="text-xs text-gray-400 font-mono">SN: CJNB234700284</p>
+                </div>
+                <div class="ml-auto"><div class="w-2 h-2 bg-green-500 rounded-full"></div></div>
+              </div>
+              <div class="mt-2 text-[11px] text-gray-500 flex gap-3">
+                <span>door_direction: <strong>IN</strong></span>
+                <span>verify: face, card</span>
+                <span>Doorlock: <strong>Relay NO</strong></span>
+              </div>
+            </div>
+            <div class="border border-purple-200 bg-purple-50 rounded-lg p-4">
+              <div class="flex items-center gap-2 mb-3">
+                <svg class="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                <span class="text-sm font-semibold text-purple-800">PINTU KELUAR (OUT)</span>
+              </div>
+              <div class="bg-white rounded-lg p-3 flex items-center gap-3">
+                <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-700 text-xs font-bold">ZK</div>
+                <div>
+                  <p class="text-sm font-medium">MB460</p>
+                  <p class="text-xs text-gray-400">Multi-biometric &middot; Face+FP+Card</p>
+                  <p class="text-xs text-gray-400 font-mono">SN: BKNS193800331</p>
+                </div>
+                <div class="ml-auto"><div class="w-2 h-2 bg-green-500 rounded-full"></div></div>
+              </div>
+              <div class="mt-2 text-[11px] text-gray-500 flex gap-3">
+                <span>door_direction: <strong>OUT</strong></span>
+                <span>verify: face, fingerprint, card</span>
+                <span>Doorlock: <strong>Relay NO</strong></span>
+              </div>
+            </div>
+          </div>
+          <div class="mt-3 p-3 bg-gray-50 rounded-lg text-xs text-gray-500">
+            <strong>Konfigurasi doorlock:</strong> Terminal mengontrol relay NO (Normally Open) untuk electric strike / magnetic lock. Karyawan terverifikasi &rarr; relay aktif &rarr; pintu terbuka 5 detik. Pengaturan Wiegand output untuk integrasi access controller eksternal tersedia di masing-masing perangkat.
+          </div>
+        </div>
+
+        <!-- Checkpoint B -->
+        <div class="card p-5">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-semibold">Checkpoint B — Pintu Belakang</h3>
+              <p class="text-xs text-gray-400">Situs: Jakarta Pusat &middot; 2 perangkat Hikvision (IN + OUT)</p>
+            </div>
+            <span class="badge badge-green">Aktif</span>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="border border-green-200 bg-green-50 rounded-lg p-4">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-sm font-semibold text-green-800">PINTU MASUK (IN)</span>
+              </div>
+              <div class="bg-white rounded-lg p-3 flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-700 text-xs font-bold">HIK</div>
+                <div>
+                  <p class="text-sm font-medium">DS-K1T673</p>
+                  <p class="text-xs text-gray-400">Face 6.5" &middot; Deep Learning</p>
+                </div>
+              </div>
+            </div>
+            <div class="border border-purple-200 bg-purple-50 rounded-lg p-4">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-sm font-semibold text-purple-800">PINTU KELUAR (OUT)</span>
+              </div>
+              <div class="bg-white rounded-lg p-3 flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-700 text-xs font-bold">HIK</div>
+                <div>
+                  <p class="text-sm font-medium">DS-K1T341AMF</p>
+                  <p class="text-xs text-gray-400">Face 4.3" &middot; MinMoe</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Checkpoint C -->
+        <div class="card p-5">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-semibold">Checkpoint C — Gate Parkir</h3>
+              <p class="text-xs text-gray-400">Situs: Jakarta Pusat &middot; 1 perangkat Dahua (BOTH — satu alat dua arah)</p>
+            </div>
+            <span class="badge badge-green">Aktif</span>
+          </div>
+          <div class="grid grid-cols-1 gap-4 max-w-md">
+            <div class="border border-gray-200 bg-gray-50 rounded-lg p-4">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-sm font-semibold text-gray-800">GABUNGAN (BOTH) — satu pintu masuk &amp; pulang</span>
+              </div>
+              <div class="bg-white rounded-lg p-3 flex items-center gap-3">
+                <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center text-amber-700 text-xs font-bold">DH</div>
+                <div>
+                  <p class="text-sm font-medium">ASI7213Y-V3</p>
+                  <p class="text-xs text-gray-400">Face 7" &middot; CGI Protocol</p>
+                </div>
+              </div>
+              <div class="mt-2 p-2 bg-yellow-50 rounded text-[11px] text-yellow-800">
+                <strong>Pintu gabungan:</strong> arah ditentukan dari jadwal, bukan tombol perangkat. Punch di jendela pulang hanya menjadi <em>calon pulang</em>; punch berikutnya menggantikannya (mis. keluar makan siang 12:00 lalu pulang 17:05 &rarr; pulang 17:05). Sesi ditutup setelah jendela pulang lewat. Jika ambigu &rarr; <span class="font-mono">unresolved_direction</span>.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Checkpoint E -->
+        <div class="card p-5">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-semibold">Checkpoint E — Pintu Karyawan</h3>
+              <p class="text-xs text-gray-400">Situs: Jakarta Pusat &middot; 1 perangkat Hikvision, 2 pembaca (arah per pembaca)</p>
+            </div>
+            <span class="badge badge-green">Aktif</span>
+          </div>
+          <div class="grid grid-cols-3 gap-4 items-center">
+            <div class="bg-white border border-gray-200 rounded-lg p-3 flex items-center gap-3">
+              <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-700 text-xs font-bold">HIK</div>
+              <div>
+                <p class="text-sm font-medium">DS-K1T671</p>
+                <p class="text-xs text-gray-400">default: <span class="font-mono">BOTH</span></p>
+              </div>
+            </div>
+            <div class="border border-green-200 bg-green-50 rounded-lg p-3">
+              <p class="text-xs font-semibold text-green-800">Pembaca 1 (luar) &rarr; IN</p>
+              <p class="text-[11px] text-gray-500 font-mono">cardReaderNo = 1</p>
+            </div>
+            <div class="border border-purple-200 bg-purple-50 rounded-lg p-3">
+              <p class="text-xs font-semibold text-purple-800">Pembaca 2 (dalam) &rarr; OUT</p>
+              <p class="text-[11px] text-gray-500 font-mono">cardReaderNo = 2</p>
+            </div>
+          </div>
+          <div class="mt-3 p-3 bg-gray-50 rounded-lg text-xs text-gray-500">
+            Pembaca yang tidak ada di peta memakai arah default perangkat. Arah disalin ke setiap punch saat masuk (<span class="font-mono">door_direction</span>), jadi mengubah peta tidak menulis ulang riwayat.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== EMPLOYEES ==================== -->
+    <div id="page-employees" class="page p-6">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-xl font-bold">Daftar Karyawan</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Kelola data karyawan dan identitas perangkat (PIN, kartu)</p>
+        </div>
+        <div class="flex gap-2">
+          <button class="bg-white border border-gray-300 text-sm px-4 py-2 rounded-lg hover:bg-gray-50 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+            Impor CSV
+          </button>
+          <button class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700">+ Tambah Karyawan</button>
+        </div>
+      </div>
+
+      <div class="card overflow-hidden">
+        <div class="p-4 border-b bg-gray-50 flex items-center gap-4">
+          <input type="text" placeholder="Cari nama, employee_no, PIN..." class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm">
+          <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+            <option>Semua Status Enroll</option>
+            <option>Terdaftar Penuh</option>
+            <option>Sebagian Terdaftar</option>
+            <option>Belum Terdaftar</option>
+          </select>
+        </div>
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 text-gray-600">
+            <tr>
+              <th class="text-left px-4 py-3 font-medium">Karyawan</th>
+              <th class="text-left px-4 py-3 font-medium">Employee No</th>
+              <th class="text-left px-4 py-3 font-medium">Situs</th>
+              <th class="text-left px-4 py-3 font-medium">Foto Wajah</th>
+              <th class="text-left px-4 py-3 font-medium">PIN Perangkat</th>
+              <th class="text-left px-4 py-3 font-medium">Enroll Status</th>
+              <th class="px-4 py-3"></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr class="table-row">
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 text-xs font-semibold">AR</div>
+                  <div>
+                    <p class="font-medium">Ahmad Rizaldi</p>
+                    <p class="text-xs text-gray-400">active</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3 font-mono text-xs">EMP-001</td>
+              <td class="px-4 py-3 text-xs">Jakarta Pusat</td>
+              <td class="px-4 py-3"><span class="badge badge-green">Terverifikasi</span></td>
+              <td class="px-4 py-3">
+                <div class="space-y-1">
+                  <div class="text-xs"><span class="text-gray-400">ZK:</span> 1001</div>
+                  <div class="text-xs"><span class="text-gray-400">HIK:</span> 1001</div>
+                  <div class="text-xs"><span class="text-gray-400">DH:</span> 1001</div>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex gap-1">
+                  <span class="badge badge-green" title="ZKTeco">ZK</span>
+                  <span class="badge badge-green" title="Hikvision">HIK</span>
+                  <span class="badge badge-green" title="Dahua">DH</span>
+                </div>
+              </td>
+              <td class="px-4 py-3"><button class="text-blue-600 text-xs hover:underline">Detail</button></td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 bg-pink-100 rounded-full flex items-center justify-center text-pink-700 text-xs font-semibold">SN</div>
+                  <div>
+                    <p class="font-medium">Siti Nurhaliza</p>
+                    <p class="text-xs text-gray-400">active</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3 font-mono text-xs">EMP-002</td>
+              <td class="px-4 py-3 text-xs">Jakarta Pusat</td>
+              <td class="px-4 py-3"><span class="badge badge-green">Terverifikasi</span></td>
+              <td class="px-4 py-3">
+                <div class="space-y-1">
+                  <div class="text-xs"><span class="text-gray-400">ZK:</span> 1002</div>
+                  <div class="text-xs"><span class="text-gray-400">HIK:</span> 1002</div>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex gap-1">
+                  <span class="badge badge-green">ZK</span>
+                  <span class="badge badge-green">HIK</span>
+                  <span class="badge badge-yellow" title="Belum di-enroll ke Dahua">DH</span>
+                </div>
+              </td>
+              <td class="px-4 py-3"><button class="text-blue-600 text-xs hover:underline">Detail</button></td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 bg-green-100 rounded-full flex items-center justify-center text-green-700 text-xs font-semibold">BS</div>
+                  <div>
+                    <p class="font-medium">Budi Santoso</p>
+                    <p class="text-xs text-gray-400">active</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3 font-mono text-xs">EMP-003</td>
+              <td class="px-4 py-3 text-xs">Jakarta Pusat</td>
+              <td class="px-4 py-3"><span class="badge badge-yellow">Pending Review</span></td>
+              <td class="px-4 py-3">
+                <div class="text-xs"><span class="text-gray-400">ZK:</span> 1003</div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex gap-1">
+                  <span class="badge badge-yellow">ZK</span>
+                  <span class="badge badge-red">HIK</span>
+                  <span class="badge badge-gray">DH</span>
+                </div>
+              </td>
+              <td class="px-4 py-3"><button class="text-blue-600 text-xs hover:underline">Detail</button></td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 bg-purple-100 rounded-full flex items-center justify-center text-purple-700 text-xs font-semibold">DL</div>
+                  <div>
+                    <p class="font-medium">Dewi Lestari</p>
+                    <p class="text-xs text-gray-400">active</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3 font-mono text-xs">EMP-004</td>
+              <td class="px-4 py-3 text-xs">Jakarta Pusat</td>
+              <td class="px-4 py-3"><span class="badge badge-red">Belum Ada</span></td>
+              <td class="px-4 py-3 text-xs text-gray-400">—</td>
+              <td class="px-4 py-3">
+                <div class="flex gap-1">
+                  <span class="badge badge-gray">—</span>
+                </div>
+              </td>
+              <td class="px-4 py-3"><button class="text-blue-600 text-xs hover:underline">Detail</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ==================== ENROLLMENT ==================== -->
+    <div id="page-enrollment" class="page p-6">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-xl font-bold">Pendaftaran Wajah</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Upload foto referensi dan fan-out ke semua perangkat karyawan</p>
+        </div>
+      </div>
+
+      <!-- Upload Section -->
+      <div class="card p-6 mb-6">
+        <h3 class="font-semibold mb-4">Upload Foto Referensi Karyawan</h3>
+        <div class="grid grid-cols-3 gap-6">
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-2">Pilih Karyawan</label>
+            <select class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm mb-4">
+              <option>Budi Santoso (EMP-003)</option>
+              <option>Dewi Lestari (EMP-004)</option>
+            </select>
+            <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-blue-400 cursor-pointer transition-colors">
+              <svg class="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <p class="text-sm text-gray-500 mb-1">Klik atau seret foto ke sini</p>
+              <p class="text-xs text-gray-400">JPG/PNG, min 300px sisi pendek, wajah depan</p>
+            </div>
+          </div>
+          <div>
+            <h4 class="text-xs font-medium text-gray-600 mb-2">Gerbang Mutu (Quality Gate)</h4>
+            <div class="space-y-2">
+              <div class="flex items-center gap-2 p-2 bg-green-50 rounded-lg">
+                <svg class="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span class="text-xs">Resolusi: 640 x 480 (min 300px)</span>
+              </div>
+              <div class="flex items-center gap-2 p-2 bg-green-50 rounded-lg">
+                <svg class="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span class="text-xs">Wajah terdeteksi: 1 wajah</span>
+              </div>
+              <div class="flex items-center gap-2 p-2 bg-green-50 rounded-lg">
+                <svg class="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span class="text-xs">Posisi: wajah depan, tidak terpotong</span>
+              </div>
+              <div class="flex items-center gap-2 p-2 bg-yellow-50 rounded-lg">
+                <svg class="w-4 h-4 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01"/></svg>
+                <span class="text-xs">Liveness: tidak tersedia (upload HR)</span>
+              </div>
+            </div>
+            <p class="text-[11px] text-gray-400 mt-3">Upload tanpa liveness: status <code class="bg-gray-100 px-1 rounded">pending_review</code> sampai attendance_admin menerima.</p>
+          </div>
+          <div>
+            <h4 class="text-xs font-medium text-gray-600 mb-2">Fan-out Perangkat</h4>
+            <p class="text-xs text-gray-500 mb-3">Setelah foto disetujui, sistem mengirim ke semua perangkat yang karyawan ini boleh pakai:</p>
+            <div class="space-y-2">
+              <div class="flex items-center gap-2 text-xs p-2 bg-gray-50 rounded-lg">
+                <div class="w-6 h-6 bg-emerald-100 rounded flex items-center justify-center text-emerald-700 text-[9px] font-bold">ZK</div>
+                <span class="flex-1">SpeedFace-V5L</span>
+                <span class="text-gray-400">Antrean ADMS</span>
+              </div>
+              <div class="flex items-center gap-2 text-xs p-2 bg-gray-50 rounded-lg">
+                <div class="w-6 h-6 bg-blue-100 rounded flex items-center justify-center text-blue-700 text-[9px] font-bold">HIK</div>
+                <span class="flex-1">DS-K1T673</span>
+                <span class="text-gray-400">FDLib API</span>
+              </div>
+              <div class="flex items-center gap-2 text-xs p-2 bg-gray-50 rounded-lg">
+                <div class="w-6 h-6 bg-amber-100 rounded flex items-center justify-center text-amber-700 text-[9px] font-bold">DH</div>
+                <span class="flex-1">ASI7213Y</span>
+                <span class="text-gray-400">AccessFace API</span>
+              </div>
+            </div>
+            <button class="mt-4 w-full bg-blue-600 text-white text-sm py-2 rounded-lg hover:bg-blue-700">Upload & Fan-out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== SYNC ==================== -->
+    <div id="page-sync" class="page p-6">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-xl font-bold">Sinkronisasi Wajah ke Perangkat</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Status enroll per karyawan per perangkat — kegagalan parsial terlihat</p>
+        </div>
+        <button class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700">Sync Ulang Gagal</button>
+      </div>
+
+      <!-- Summary -->
+      <div class="grid grid-cols-4 gap-4 mb-6">
+        <div class="card p-4"><p class="text-xs text-gray-500 mb-1">Total Karyawan</p><p class="text-2xl font-bold">248</p></div>
+        <div class="card p-4"><p class="text-xs text-gray-500 mb-1">Enrolled Penuh</p><p class="text-2xl font-bold text-green-600">230</p></div>
+        <div class="card p-4"><p class="text-xs text-gray-500 mb-1">Sebagian Enrolled</p><p class="text-2xl font-bold text-yellow-600">12</p></div>
+        <div class="card p-4"><p class="text-xs text-gray-500 mb-1">Gagal / Pending</p><p class="text-2xl font-bold text-red-600">6</p></div>
+      </div>
+
+      <!-- Sync Matrix -->
+      <div class="card overflow-hidden">
+        <div class="p-4 border-b bg-gray-50">
+          <h3 class="font-semibold text-sm">Matriks Enrollment Wajah</h3>
+          <p class="text-xs text-gray-400">Satu foto referensi &rarr; tiap perangkat ekstrak template sendiri</p>
+        </div>
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 text-gray-600">
+            <tr>
+              <th class="text-left px-4 py-3 font-medium">Karyawan</th>
+              <th class="text-center px-3 py-3 font-medium text-[11px]">ZK SpeedFace<br>Lobby IN</th>
+              <th class="text-center px-3 py-3 font-medium text-[11px]">ZK MB460<br>Lobby OUT</th>
+              <th class="text-center px-3 py-3 font-medium text-[11px]">HIK DS-K1T673<br>Belakang IN</th>
+              <th class="text-center px-3 py-3 font-medium text-[11px]">HIK DS-K1T341<br>Belakang OUT</th>
+              <th class="text-center px-3 py-3 font-medium text-[11px]">DH ASI7213Y<br>Parkir BOTH</th>
+              <th class="text-center px-3 py-3 font-medium text-[11px]">Terakhir Sync</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr class="table-row">
+              <td class="px-4 py-3 font-medium">Ahmad Rizaldi</td>
+              <td class="px-3 py-3 text-center"><span class="inline-block w-6 h-6 bg-green-100 rounded-full text-green-600 leading-6 text-xs">&#10003;</span></td>
+              <td class="px-3 py-3 text-center"><span class="inline-block w-6 h-6 bg-green-100 rounded-full text-green-600 leading-6 text-xs">&#10003;</span></td>
+              <td class="px-3 py-3 text-center"><span class="inline-block w-6 h-6 bg-green-100 rounded-full text-green-600 leading-6 text-xs">&#10003;</span></td>
+              <td class="px-3 py-3 text-center"><span class="inline-block w-6 h-6 bg-green-100 rounded-full text-green-600 leading-6 text-xs">&#10003;</span></td>
+              <td class="px-3 py-3 text-center"><span class="inline-block w-6 h-6 bg-green-100 rounded-full text-green-600 leading-6 text-xs">&#10003;</span></td>
+              <td class="px-3 py-3 text-center text-xs text-gray-400">29 Sep 14:20</td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-4 py-3 font-medium">Siti Nurhaliza</td>
+              <td class="px-3 py-3 text-center"><span class="inline-block w-6 h-6 bg-green-100 rounded-full text-green-600 leading-6 text-xs">&#10003;</span></td>
+              <td class="px-3 py-3 text-center"><span class="inline-block w-6 h-6 bg-green-100 rounded-full text-green-600 leading-6 text-xs">&#10003;</span></td>
+              <td class="px-3 py-3 text-center"><span class="inline-block w-6 h-6 bg-green-100 rounded-full text-green-600 leading-6 text-xs">&#10003;</span></td>
+              <td class="px-3 py-3 text-center"><span class="inline-block w-6 h-6 bg-green-100 rounded-full text-green-600 leading-6 text-xs">&#10003;</span></td>
+              <td class="px-3 py-3 text-center"><span class="inline-block w-6 h-6 bg-yellow-100 rounded-full text-yellow-600 leading-6 text-xs">!</span></td>
+              <td class="px-3 py-3 text-center text-xs text-yellow-600">Pending — retry 2</td>
+            </tr>
+            <tr class="table-row bg-red-50">
+              <td class="px-4 py-3 font-medium">Budi Santoso</td>
+              <td class="px-3 py-3 text-center"><span class="inline-block w-6 h-6 bg-yellow-100 rounded-full text-yellow-600 leading-6 text-xs">!</span></td>
+              <td class="px-3 py-3 text-center"><span class="inline-block w-6 h-6 bg-gray-100 rounded-full text-gray-400 leading-6 text-xs">—</span></td>
+              <td class="px-3 py-3 text-center"><span class="inline-block w-6 h-6 bg-red-100 rounded-full text-red-600 leading-6 text-xs">&#10007;</span></td>
+              <td class="px-3 py-3 text-center"><span class="inline-block w-6 h-6 bg-gray-100 rounded-full text-gray-400 leading-6 text-xs">—</span></td>
+              <td class="px-3 py-3 text-center"><span class="inline-block w-6 h-6 bg-gray-100 rounded-full text-gray-400 leading-6 text-xs">—</span></td>
+              <td class="px-3 py-3 text-center text-xs text-red-600">Gagal: foto pending_review</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Sync Log -->
+      <div class="card p-5 mt-4">
+        <h3 class="font-semibold text-sm mb-3">Log Sinkronisasi Terbaru</h3>
+        <div class="space-y-2 text-xs">
+          <div class="flex items-center gap-3 p-2 bg-green-50 rounded-lg">
+            <div class="timeline-dot bg-green-500"></div>
+            <span class="text-gray-400 w-32">30 Sep 08:10:22</span>
+            <span class="font-medium">Ahmad Rizaldi &rarr; ZK SpeedFace-V5L</span>
+            <span class="badge badge-green ml-auto">enrolled</span>
+            <span class="text-gray-400">via ADMS USERINFO</span>
+          </div>
+          <div class="flex items-center gap-3 p-2 bg-red-50 rounded-lg">
+            <div class="timeline-dot bg-red-500"></div>
+            <span class="text-gray-400 w-32">30 Sep 08:08:15</span>
+            <span class="font-medium">Budi Santoso &rarr; HIK DS-K1T673</span>
+            <span class="badge badge-red ml-auto">failed</span>
+            <span class="text-red-600">FDLib: face quality insufficient</span>
+          </div>
+          <div class="flex items-center gap-3 p-2 bg-yellow-50 rounded-lg">
+            <div class="timeline-dot bg-yellow-500"></div>
+            <span class="text-gray-400 w-32">30 Sep 08:05:30</span>
+            <span class="font-medium">Siti Nurhaliza &rarr; DH ASI7213Y</span>
+            <span class="badge badge-yellow ml-auto">pending</span>
+            <span class="text-yellow-600">Device unreachable — retry scheduled</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== SCHEDULE ==================== -->
+    <div id="page-schedule" class="page p-6">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-xl font-bold">Jadwal Kerja</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Shift templates, assignments, dan kalender</p>
+        </div>
+        <div class="flex gap-2">
+          <button class="bg-white border border-gray-300 text-sm px-4 py-2 rounded-lg hover:bg-gray-50">Materialize Roster</button>
+          <button class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700">+ Template Baru</button>
+        </div>
+      </div>
+
+      <!-- Shift Templates -->
+      <div class="card p-5 mb-6">
+        <h3 class="font-semibold mb-4">Shift Templates</h3>
+        <div class="grid grid-cols-3 gap-4">
+          <div class="border border-blue-200 bg-blue-50 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-2">
+              <h4 class="font-semibold text-blue-900">Shift Pagi</h4>
+              <span class="badge badge-blue">Default Situs</span>
+            </div>
+            <div class="space-y-1 text-xs text-blue-800">
+              <p><strong>Jam:</strong> 08:00 — 17:00</p>
+              <p><strong>Istirahat:</strong> 12:00 — 13:00 (unpaid)</p>
+              <p><strong>Hari:</strong> Sen–Jum (ISO 1–5)</p>
+              <p><strong>Kebijakan:</strong> pp35-default-2026 (five_day)</p>
+            </div>
+            <div class="mt-3 pt-2 border-t border-blue-200 text-[11px] text-blue-600">
+              in_grace: 15m &middot; out_grace: 30m &middot; late_limit: 180m
+            </div>
+          </div>
+          <div class="border border-purple-200 bg-purple-50 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-2">
+              <h4 class="font-semibold text-purple-900">Shift Malam</h4>
+              <span class="badge badge-purple">Cross-midnight</span>
+            </div>
+            <div class="space-y-1 text-xs text-purple-800">
+              <p><strong>Jam:</strong> 22:00 — 06:00 (+1 hari)</p>
+              <p><strong>Istirahat:</strong> 02:00 — 03:00 (unpaid)</p>
+              <p><strong>Hari:</strong> Sen–Jum (ISO 1–5)</p>
+              <p><strong>Kebijakan:</strong> pp35-default-2026</p>
+            </div>
+            <div class="mt-3 pt-2 border-t border-purple-200 text-[11px] text-purple-600">
+              end_local &le; start_local &rarr; scheduled_end = hari sipil +1
+            </div>
+          </div>
+          <div class="border border-gray-200 bg-gray-50 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-2">
+              <h4 class="font-semibold text-gray-700">Shift Siang (6 Hari)</h4>
+              <span class="badge badge-gray">six_day preset</span>
+            </div>
+            <div class="space-y-1 text-xs text-gray-600">
+              <p><strong>Jam:</strong> 07:00 — 15:00</p>
+              <p><strong>Istirahat:</strong> 12:00 — 12:30 (unpaid)</p>
+              <p><strong>Hari:</strong> Sen–Sab (ISO 1–6)</p>
+              <p><strong>Kebijakan:</strong> pp35-default-2026 (six_day)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Calendar + Assignment -->
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <!-- Calendar View -->
+        <div class="card p-5">
+          <h3 class="font-semibold mb-4">Kalender September 2026</h3>
+          <div class="grid grid-cols-7 gap-1 text-center text-xs">
+            <div class="py-1 text-gray-400 font-medium">Sen</div>
+            <div class="py-1 text-gray-400 font-medium">Sel</div>
+            <div class="py-1 text-gray-400 font-medium">Rab</div>
+            <div class="py-1 text-gray-400 font-medium">Kam</div>
+            <div class="py-1 text-gray-400 font-medium">Jum</div>
+            <div class="py-1 text-red-400 font-medium">Sab</div>
+            <div class="py-1 text-red-400 font-medium">Min</div>
+            <!-- Row 1: empty + 1-6 -->
+            <div></div>
+            <div class="py-2 rounded hover:bg-blue-50 cursor-pointer">1</div>
+            <div class="py-2 rounded hover:bg-blue-50 cursor-pointer">2</div>
+            <div class="py-2 rounded hover:bg-blue-50 cursor-pointer">3</div>
+            <div class="py-2 rounded hover:bg-blue-50 cursor-pointer">4</div>
+            <div class="py-2 rounded bg-red-50 text-red-600">5</div>
+            <div class="py-2 rounded bg-red-50 text-red-600">6</div>
+            <!-- Row 2: 7-13 -->
+            <div class="py-2 rounded hover:bg-blue-50 cursor-pointer">7</div>
+            <div class="py-2 rounded hover:bg-blue-50 cursor-pointer">8</div>
+            <div class="py-2 rounded hover:bg-blue-50 cursor-pointer">9</div>
+            <div class="py-2 rounded hover:bg-blue-50 cursor-pointer">10</div>
+            <div class="py-2 rounded hover:bg-blue-50 cursor-pointer">11</div>
+            <div class="py-2 rounded bg-red-50 text-red-600">12</div>
+            <div class="py-2 rounded bg-red-50 text-red-600">13</div>
+            <!-- Row 3: 14-20 -->
+            <div class="py-2 rounded hover:bg-blue-50 cursor-pointer">14</div>
+            <div class="py-2 rounded hover:bg-blue-50 cursor-pointer">15</div>
+            <div class="py-2 rounded hover:bg-blue-50 cursor-pointer">16</div>
+            <div class="py-2 rounded hover:bg-blue-50 cursor-pointer">17</div>
+            <div class="py-2 rounded hover:bg-blue-50 cursor-pointer">18</div>
+            <div class="py-2 rounded bg-red-50 text-red-600">19</div>
+            <div class="py-2 rounded bg-red-50 text-red-600">20</div>
+            <!-- Row 4: 21-27 -->
+            <div class="py-2 rounded hover:bg-blue-50 cursor-pointer">21</div>
+            <div class="py-2 rounded hover:bg-blue-50 cursor-pointer">22</div>
+            <div class="py-2 rounded hover:bg-blue-50 cursor-pointer">23</div>
+            <div class="py-2 rounded hover:bg-blue-50 cursor-pointer">24</div>
+            <div class="py-2 rounded hover:bg-blue-50 cursor-pointer">25</div>
+            <div class="py-2 rounded bg-red-50 text-red-600">26</div>
+            <div class="py-2 rounded bg-red-50 text-red-600">27</div>
+            <!-- Row 5: 28-30 -->
+            <div class="py-2 rounded bg-blue-600 text-white font-semibold">28</div>
+            <div class="py-2 rounded bg-blue-600 text-white font-semibold">29</div>
+            <div class="py-2 rounded bg-blue-100 text-blue-800 font-semibold">30</div>
+          </div>
+          <div class="mt-3 flex gap-3 text-[10px]">
+            <span class="flex items-center gap-1"><span class="w-3 h-3 bg-blue-600 rounded"></span> Kasus A/B/C contoh</span>
+            <span class="flex items-center gap-1"><span class="w-3 h-3 bg-red-100 rounded"></span> weekly_rest</span>
+          </div>
+        </div>
+
+        <!-- Shift Assignment -->
+        <div class="card p-5">
+          <h3 class="font-semibold mb-4">Shift Assignments</h3>
+          <div class="space-y-2 text-xs">
+            <div class="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+              <span class="font-medium w-32">Ahmad Rizaldi</span>
+              <span class="badge badge-blue">Shift Pagi</span>
+              <span class="flex-1 text-gray-500">Rentang: 01 Sep — (terbuka)</span>
+              <span class="badge badge-green">Aktif</span>
+            </div>
+            <div class="flex items-center gap-3 p-3 bg-purple-50 rounded-lg border border-purple-200">
+              <span class="font-medium w-32">Budi Santoso</span>
+              <span class="badge badge-purple">Shift Malam</span>
+              <span class="flex-1 text-gray-500">Rentang: 15 Sep — 30 Sep</span>
+              <span class="badge badge-green">Aktif</span>
+            </div>
+            <div class="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+              <span class="font-medium w-32">Siti Nurhaliza</span>
+              <span class="badge badge-blue">Shift Pagi</span>
+              <span class="flex-1 text-gray-500">Override 28 Sep: <strong>Shift Malam</strong></span>
+              <span class="badge badge-yellow">Override</span>
+            </div>
+          </div>
+          <div class="mt-4 p-3 bg-gray-50 rounded-lg text-[11px] text-gray-500">
+            <strong>Resolusi template (prioritas):</strong><br>
+            1. Override civil_date &rarr; 2. Rentang start_date/end_date &rarr; 3. sites.default_template_id (jika DOW cocok)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== OVERTIME ==================== -->
+    <div id="page-overtime" class="page p-6">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-xl font-bold">Manajemen Lembur</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Kuota menit per tanggal &middot; wajib disetujui lebih dulu &middot; jam pemakaian bebas di luar shift</p>
+        </div>
+        <button onclick="document.getElementById('modal-ot').classList.remove('hidden')" class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700">+ Ajukan Kuota Lembur</button>
+      </div>
+
+      <!-- Rules strip -->
+      <div class="grid grid-cols-3 gap-4 mb-4 text-xs">
+        <div class="card p-4">
+          <p class="font-semibold text-gray-800 mb-1">1. Disetujui dulu</p>
+          <p class="text-gray-500">Menit yang dikerjakan sebelum waktu persetujuan tidak dibayar (<span class="font-mono">UNPAID_BEFORE_APPROVAL</span>). Persetujuan mundur: <strong>ditolak</strong>.</p>
+        </div>
+        <div class="card p-4">
+          <p class="font-semibold text-gray-800 mb-1">2. Jam bebas, jumlah dibatasi</p>
+          <p class="text-gray-500">Kuota boleh dipakai sebelum atau sesudah shift, termasuk lewat tengah malam. Di atas kuota: <span class="font-mono">UNPAID_OVER_QUOTA</span>.</p>
+        </div>
+        <div class="card p-4">
+          <p class="font-semibold text-gray-800 mb-1">3. Supervisor menyetujui</p>
+          <p class="text-gray-500">Supervisor langsung menyetujui untuk timnya. Tidak bisa untuk dirinya sendiri; itu diteruskan ke atasan / attendance_admin.</p>
+        </div>
+      </div>
+
+      <div class="card overflow-hidden">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 text-gray-600">
+            <tr>
+              <th class="text-left px-4 py-3 font-medium">Karyawan</th>
+              <th class="text-left px-4 py-3 font-medium">attendance_date</th>
+              <th class="text-left px-4 py-3 font-medium">Kuota</th>
+              <th class="text-left px-4 py-3 font-medium w-44">Terpakai</th>
+              <th class="text-left px-4 py-3 font-medium">Disetujui</th>
+              <th class="text-left px-4 py-3 font-medium">Status</th>
+              <th class="text-left px-4 py-3 font-medium">Catatan</th>
+              <th class="px-4 py-3"></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr class="table-row">
+              <td class="px-4 py-3"><p class="font-medium">Ahmad Rizaldi</p><p class="text-[11px] text-gray-400">Kasus A</p></td>
+              <td class="px-4 py-3 text-xs font-mono">2026-09-28</td>
+              <td class="px-4 py-3 text-xs"><strong>540 m</strong> <span class="text-gray-400">(9 j)</span></td>
+              <td class="px-4 py-3 text-xs">
+                <div class="flex justify-between mb-1"><span>530 m</span><span class="text-gray-400">sisa 10 hangus</span></div>
+                <div class="h-1.5 bg-gray-100 rounded-full"><div class="h-1.5 bg-blue-500 rounded-full" style="width:98%"></div></div>
+              </td>
+              <td class="px-4 py-3 text-xs"><p>Jum 25 Sep 14:00</p><p class="text-gray-400">Rudi H. (supervisor)</p></td>
+              <td class="px-4 py-3"><span class="badge badge-green">Approved</span></td>
+              <td class="px-4 py-3 text-xs text-gray-500">Lewat tengah malam, s.d. 01:50 Sel</td>
+              <td class="px-4 py-3"><button class="text-blue-600 text-xs">Detail</button></td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-4 py-3"><p class="font-medium">Siti Nurhaliza</p><p class="text-[11px] text-gray-400">Kasus B hari 1</p></td>
+              <td class="px-4 py-3 text-xs font-mono">2026-09-28</td>
+              <td class="px-4 py-3 text-xs"><strong>300 m</strong> <span class="text-gray-400">(5 j)</span></td>
+              <td class="px-4 py-3 text-xs">
+                <div class="flex justify-between mb-1"><span>280 m</span><span class="text-gray-400">sisa 20</span></div>
+                <div class="h-1.5 bg-gray-100 rounded-full"><div class="h-1.5 bg-blue-500 rounded-full" style="width:93%"></div></div>
+              </td>
+              <td class="px-4 py-3 text-xs"><p>Jum 25 Sep 14:00</p><p class="text-gray-400">Rudi H. (supervisor)</p></td>
+              <td class="px-4 py-3"><span class="badge badge-green">Approved</span></td>
+              <td class="px-4 py-3"><span class="badge badge-yellow">cap harian: 40 m</span></td>
+              <td class="px-4 py-3"><button class="text-blue-600 text-xs">Detail</button></td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-4 py-3"><p class="font-medium">Siti Nurhaliza</p><p class="text-[11px] text-gray-400">Kasus B hari 2</p></td>
+              <td class="px-4 py-3 text-xs font-mono">2026-09-29</td>
+              <td class="px-4 py-3 text-xs"><strong>300 m</strong> <span class="text-gray-400">(5 j)</span></td>
+              <td class="px-4 py-3 text-xs">
+                <div class="flex justify-between mb-1"><span>300 m</span><span class="text-red-600">+5 di atas kuota</span></div>
+                <div class="h-1.5 bg-gray-100 rounded-full"><div class="h-1.5 bg-red-500 rounded-full" style="width:100%"></div></div>
+              </td>
+              <td class="px-4 py-3 text-xs"><p>Jum 25 Sep 14:00</p><p class="text-gray-400">Rudi H. (supervisor)</p></td>
+              <td class="px-4 py-3"><span class="badge badge-green">Approved</span></td>
+              <td class="px-4 py-3"><span class="badge badge-gray">UNPAID_OVER_QUOTA 5 m</span></td>
+              <td class="px-4 py-3"><button class="text-blue-600 text-xs">Detail</button></td>
+            </tr>
+            <tr class="table-row bg-yellow-50">
+              <td class="px-4 py-3"><p class="font-medium">Budi Santoso</p><p class="text-[11px] text-gray-400">Kasus C</p></td>
+              <td class="px-4 py-3 text-xs font-mono">2026-09-28</td>
+              <td class="px-4 py-3 text-xs"><strong>960 m</strong> <span class="text-gray-400">(16 j)</span></td>
+              <td class="px-4 py-3 text-xs">
+                <div class="flex justify-between mb-1"><span>820 m</span><span class="text-gray-400">dapat dipakai 1.095</span></div>
+                <div class="h-1.5 bg-gray-100 rounded-full"><div class="h-1.5 bg-blue-500 rounded-full" style="width:85%"></div></div>
+              </td>
+              <td class="px-4 py-3 text-xs"><p>Jum 25 Sep 14:00</p><p class="text-gray-400">Rudi H. (supervisor)</p></td>
+              <td class="px-4 py-3"><span class="badge badge-green">Approved</span></td>
+              <td class="px-4 py-3 text-xs"><span class="badge badge-yellow">envelope_clamped</span><p class="text-gray-500 mt-1">Pulang paling lambat Sel 07:15</p></td>
+              <td class="px-4 py-3"><button class="text-blue-600 text-xs">Detail</button></td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-4 py-3"><p class="font-medium">Joko Prasetyo</p><p class="text-[11px] text-gray-400">Disetujui terlambat</p></td>
+              <td class="px-4 py-3 text-xs font-mono">2026-09-30</td>
+              <td class="px-4 py-3 text-xs"><strong>120 m</strong> <span class="text-gray-400">(2 j)</span></td>
+              <td class="px-4 py-3 text-xs">
+                <div class="flex justify-between mb-1"><span>60 m</span><span class="text-red-600">90 m sebelum approve</span></div>
+                <div class="h-1.5 bg-gray-100 rounded-full"><div class="h-1.5 bg-blue-500 rounded-full" style="width:50%"></div></div>
+              </td>
+              <td class="px-4 py-3 text-xs"><p>Rab 30 Sep 18:30</p><p class="text-gray-400">Rudi H. (supervisor)</p></td>
+              <td class="px-4 py-3"><span class="badge badge-green">Approved</span></td>
+              <td class="px-4 py-3 text-xs text-gray-500">Kerja 17:00–19:30. 17:00–18:30 = <span class="font-mono">UNPAID_BEFORE_APPROVAL</span></td>
+              <td class="px-4 py-3"><button class="text-blue-600 text-xs">Detail</button></td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-4 py-3"><p class="font-medium">Rudi Hartono</p><p class="text-[11px] text-gray-400">Supervisor — untuk diri sendiri</p></td>
+              <td class="px-4 py-3 text-xs font-mono">2026-10-01</td>
+              <td class="px-4 py-3 text-xs"><strong>180 m</strong> <span class="text-gray-400">(3 j)</span></td>
+              <td class="px-4 py-3 text-xs text-gray-400">—</td>
+              <td class="px-4 py-3 text-xs text-gray-400">Menunggu atasan</td>
+              <td class="px-4 py-3"><span class="badge badge-yellow">Requested</span></td>
+              <td class="px-4 py-3 text-xs text-gray-500">self_approval_forbidden</td>
+              <td class="px-4 py-3">
+                <div class="flex gap-1">
+                  <button class="bg-green-600 text-white text-xs px-3 py-1 rounded hover:bg-green-700" title="Hanya atasan / attendance_admin">Approve</button>
+                  <button class="bg-red-100 text-red-700 text-xs px-3 py-1 rounded hover:bg-red-200">Reject</button>
+                </div>
+              </td>
+            </tr>
+            <tr class="table-row text-gray-400">
+              <td class="px-4 py-3"><p class="font-medium">Dewi Lestari</p></td>
+              <td class="px-4 py-3 text-xs font-mono">2026-09-29</td>
+              <td class="px-4 py-3 text-xs">120 m</td>
+              <td class="px-4 py-3 text-xs">—</td>
+              <td class="px-4 py-3 text-xs">Tidak diputuskan</td>
+              <td class="px-4 py-3"><span class="badge badge-gray">Expired</span></td>
+              <td class="px-4 py-3 text-xs">Kedaluwarsa setelah out_close 17:30</td>
+              <td class="px-4 py-3"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 mt-4">
+        <!-- Policy settings (HR manual) -->
+        <div class="card p-5">
+          <div class="flex items-center justify-between mb-1">
+            <h3 class="font-semibold text-sm">Pengaturan Lembur — PayPolicy</h3>
+            <span class="badge badge-blue">pp35-default-2026 v2</span>
+          </div>
+          <p class="text-xs text-gray-500 mb-4">Diatur manual oleh HR. Menyimpan membuat versi kebijakan baru dan menghitung ulang tanggal yang terdampak.</p>
+          <div class="space-y-3 text-sm">
+            <div class="grid grid-cols-5 gap-3 items-start">
+              <label class="col-span-3 text-xs text-gray-700"><strong>Blok minimum lembur</strong><br><span class="text-gray-400">Kerja di luar shift lebih pendek dari ini tidak memakan kuota. 0 = setiap menit dihitung.</span></label>
+              <div class="col-span-2 flex items-center gap-2"><input type="number" value="30" min="0" max="240" class="w-20 border border-gray-300 rounded-lg px-2 py-1.5 text-sm"><span class="text-xs text-gray-400">menit (0–240)</span></div>
+            </div>
+            <div class="grid grid-cols-5 gap-3 items-start">
+              <label class="col-span-3 text-xs text-gray-700"><strong>Lembur sebelum shift, maksimum</strong><br><span class="text-gray-400">Seberapa jauh sebelum jam masuk kuota boleh dipakai. 0 = hanya sesudah shift.</span></label>
+              <div class="col-span-2 flex items-center gap-2"><input type="number" value="240" min="0" max="720" class="w-20 border border-gray-300 rounded-lg px-2 py-1.5 text-sm"><span class="text-xs text-gray-400">menit (0–720)</span></div>
+            </div>
+            <div class="grid grid-cols-5 gap-3 items-start">
+              <label class="col-span-3 text-xs text-gray-700"><strong>Istirahat minimum antar hari</strong><br><span class="text-gray-400">Hanya peringatan <span class="font-mono">min_rest_violation</span>, tidak memblokir.</span></label>
+              <div class="col-span-2 flex items-center gap-2"><input type="number" value="1" min="0" max="24" class="w-20 border border-gray-300 rounded-lg px-2 py-1.5 text-sm"><span class="text-xs text-gray-400">jam</span></div>
+            </div>
+            <div class="grid grid-cols-5 gap-3 items-start">
+              <label class="col-span-3 text-xs text-gray-700"><strong>Kuota maksimum per hari</strong><br><span class="text-gray-400">Batas input, bukan cap upah. Cap tetap 4 j/hari, 18 j/minggu.</span></label>
+              <div class="col-span-2 flex items-center gap-2"><input type="number" value="960" class="w-20 border border-gray-300 rounded-lg px-2 py-1.5 text-sm"><span class="text-xs text-gray-400">menit</span></div>
+            </div>
+            <div class="grid grid-cols-5 gap-3 items-start">
+              <label class="col-span-3 text-xs text-gray-700"><strong>Persetujuan mundur</strong><br><span class="text-gray-400">Memundurkan waktu berlaku kuota.</span></label>
+              <div class="col-span-2">
+                <select class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm">
+                  <option selected>Ditolak (deny)</option>
+                  <option>Hanya attendance_admin</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <details class="mt-4 text-xs">
+            <summary class="cursor-pointer text-blue-600">Efek nilai ekstrem</summary>
+            <ul class="mt-2 space-y-1 text-gray-600 list-disc pl-4">
+              <li>Blok minimum 0: datang 5 menit lebih awal sudah memakan kuota; kuota sore bisa berkurang tanpa disadari.</li>
+              <li>Blok minimum besar: lembur singkat yang sah tidak pernah terbayar.</li>
+              <li>Pra-shift 0: kuota besar lebih sering bertabrakan dengan hari berikutnya (409).</li>
+              <li>Pra-shift besar: jendela masuk melebar ke malam sebelumnya.</li>
+            </ul>
+          </details>
+          <div class="flex justify-end mt-4">
+            <button class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700">Simpan sebagai versi baru</button>
+          </div>
+        </div>
+
+        <!-- OT Case Reference -->
+        <div class="card p-5">
+          <h3 class="font-semibold text-sm mb-3">Referensi Kasus Lembur</h3>
+          <div class="space-y-3 text-xs">
+            <div class="p-3 bg-blue-50 rounded-lg border border-blue-200">
+              <h4 class="font-semibold text-blue-900 mb-1">Kasus A — Kontinu melewati tengah malam</h4>
+              <p class="text-blue-800">Kuota 540 m. Terpakai 17:00 &rarr; 01:50 (+1) = 530 m. Amplop 04:00 &rarr; 02:00 (+1). Zona mati 02:31 — 07:44.</p>
+              <p class="text-blue-600 mt-1">Cap harian <strong>tidak</strong> reset di tengah malam. Istirahat 6 j &ge; 1 j: tanpa peringatan.</p>
+            </div>
+            <div class="p-3 bg-green-50 rounded-lg border border-green-200">
+              <h4 class="font-semibold text-green-900 mb-1">Kasus B — Dua hari berturut-turut</h4>
+              <p class="text-green-800">Dua order kuota 300 m. Kuota Senin tidak bisa dipakai Selasa. Selasa 305 m kerja &rarr; 300 OT + 5 <span class="font-mono">UNPAID_OVER_QUOTA</span>.</p>
+            </div>
+            <div class="p-3 bg-red-50 rounded-lg border border-red-200">
+              <h4 class="font-semibold text-red-900 mb-1">Kasus C / C2 — Kuota menabrak shift berikutnya</h4>
+              <p class="text-red-800">Kuota 960 m: amplop sesudah shift dipotong ke 07:15. Masih muat (855 + 240 pra-shift) &rarr; disetujui dengan peringatan. C2 (pra-shift 0): muat 855 &lt; 960 &rarr; 409, override hanya attendance_admin.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit OT Modal -->
+      <div id="modal-ot" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-overlay">
+        <div class="bg-white rounded-xl shadow-2xl w-[680px] max-h-[90vh] overflow-y-auto">
+          <div class="flex items-center justify-between p-5 border-b">
+            <div>
+              <h3 class="text-lg font-bold">Ajukan Kuota Lembur</h3>
+              <p class="text-xs text-gray-500">Sebagai supervisor, pengajuan untuk tim Anda langsung disetujui saat disimpan.</p>
+            </div>
+            <button onclick="document.getElementById('modal-ot').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+          </div>
+          <div class="p-5 space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Karyawan</label>
+                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                  <option>Ahmad Rizaldi — Gudang A</option>
+                  <option>Siti Nurhaliza — Gudang A</option>
+                  <option>Budi Santoso — Gudang A</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Tanggal kerja (attendance_date)</label>
+                <input type="date" value="2026-10-02" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Kuota lembur</label>
+                <div class="flex items-center gap-2">
+                  <input type="number" value="3" min="0" class="w-20 border border-gray-300 rounded-lg px-3 py-2 text-sm"><span class="text-sm text-gray-500">jam</span>
+                  <input type="number" value="0" min="0" max="59" class="w-20 border border-gray-300 rounded-lg px-3 py-2 text-sm"><span class="text-sm text-gray-500">menit</span>
+                </div>
+                <p class="text-[11px] text-gray-400 mt-1">= 180 menit. Tanpa jam mulai/selesai; karyawan bebas memakainya di luar shift.</p>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Alasan</label>
+                <input type="text" placeholder="mis. stok opname" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+              </div>
+            </div>
+
+            <!-- Preview -->
+            <div class="border border-gray-200 rounded-lg p-4">
+              <p class="text-xs font-semibold text-gray-700 mb-3">Pratinjau (preview_compile)</p>
+              <div class="relative h-8 bg-gray-100 rounded mb-1 overflow-hidden">
+                <!-- skala: 0% = 00:00, 100% = 06:00 (+1), 30 jam -->
+                <div class="absolute top-0 bottom-0 bg-amber-200" style="left:16.7%;width:10%" title="Amplop pra-shift 05:00–08:00"></div>
+                <div class="absolute top-0 bottom-0 bg-blue-500" style="left:26.7%;width:30%" title="Shift 08:00–17:00"></div>
+                <div class="absolute top-0 bottom-0 bg-amber-200" style="left:56.7%;width:10%" title="Amplop sesudah shift 17:00–20:00"></div>
+              </div>
+              <div class="relative h-4 text-[10px] text-gray-400 mb-2">
+                <span class="absolute" style="left:0">00:00</span>
+                <span class="absolute -translate-x-1/2" style="left:16.7%">05:00</span>
+                <span class="absolute -translate-x-1/2" style="left:26.7%">08:00</span>
+                <span class="absolute -translate-x-1/2" style="left:56.7%">17:00</span>
+                <span class="absolute -translate-x-1/2" style="left:66.7%">20:00</span>
+                <span class="absolute right-0">06:00 (+1)</span>
+              </div>
+              <div class="flex gap-4 text-[11px] text-gray-500 mb-3">
+                <span class="flex items-center gap-1"><span class="w-3 h-3 bg-blue-500 rounded"></span> Shift</span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 bg-amber-200 rounded"></span> Amplop: kuota boleh dipakai di sini</span>
+              </div>
+              <div class="grid grid-cols-3 gap-3 text-xs">
+                <div><p class="text-gray-500">Amplop mulai</p><p class="font-semibold">05:00</p></div>
+                <div><p class="text-gray-500">Pulang paling lambat</p><p class="font-semibold">20:00 (+30 m grace)</p></div>
+                <div><p class="text-gray-500">Kuota dapat dipakai</p><p class="font-semibold text-green-700">360 m &ge; 180 m ✓</p></div>
+              </div>
+              <div class="mt-3 space-y-1.5 text-xs">
+                <div class="flex items-center gap-2 p-2 bg-yellow-50 rounded"><span class="badge badge-yellow">daily_cap_preview</span><span class="text-yellow-800">Sudah ada 120 m lembur di tanggal ini; total 300 m melewati cap harian 240 m. Kelebihan tetap tercatat sebagai OT_OVER_CAP.</span></div>
+                <div class="flex items-center gap-2 p-2 bg-gray-50 rounded"><span class="badge badge-gray">info</span><span class="text-gray-600">Menit yang dikerjakan sebelum Anda menyimpan tidak dibayar.</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="flex justify-end gap-3 p-5 border-t bg-gray-50 rounded-b-xl">
+            <button onclick="document.getElementById('modal-ot').classList.add('hidden')" class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">Batal</button>
+            <button class="px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700">Simpan &amp; Setujui</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== REPORTS ==================== -->
+    <div id="page-reports" class="page p-6">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-xl font-bold">Laporan Absensi</h2>
+          <p class="text-sm text-gray-500 mt-0.5">WorkSessions + WorkSegments — date_basis: attendance_date</p>
+        </div>
+        <div class="flex gap-3 items-center">
+          <input type="date" value="2026-09-28" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+          <span class="text-gray-400">—</span>
+          <input type="date" value="2026-09-29" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+          <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+            <option>attendance_date</option>
+            <option>civil_date</option>
+          </select>
+          <button class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700">Filter</button>
+        </div>
+      </div>
+
+      <!-- Kasus A detail -->
+      <div class="card overflow-hidden mb-4">
+        <div class="p-4 border-b bg-blue-50">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-semibold">Ahmad Rizaldi — 28 Sep 2026 (Senin)</h3>
+              <p class="text-xs text-gray-500">Kasus A: Shift Pagi + lembur kuota 540 m melewati tengah malam &middot; version 3 &middot; status: closed</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="badge badge-green">Closed</span>
+              <span class="badge badge-yellow">daily_ot_cap_exceeded: 290m</span>
+            </div>
+          </div>
+        </div>
+        <div class="p-4">
+          <div class="flex gap-6 text-xs mb-4">
+            <div><span class="text-gray-500">IN:</span> <strong>07:55</strong> (Sen 28 Sep)</div>
+            <div><span class="text-gray-500">OUT:</span> <strong>01:50</strong> (Sel 29 Sep)</div>
+            <div><span class="text-gray-500">Durasi:</span> <strong>1.075 menit</strong></div>
+            <div><span class="text-gray-500">Terlambat:</span> <strong>0 menit</strong></div>
+            <div><span class="text-gray-500">Reguler:</span> <strong>480 menit</strong></div>
+            <div><span class="text-gray-500">Lembur (cap):</span> <strong>240 menit</strong></div>
+            <div><span class="text-gray-500">Lembur (over):</span> <strong class="text-red-600">290 menit</strong></div>
+            <div><span class="text-gray-500">Kuota:</span> <strong>530 / 540</strong></div>
+          </div>
+          <table class="w-full text-xs">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="text-left px-3 py-2 font-medium">Mulai</th>
+                <th class="text-left px-3 py-2 font-medium">Selesai</th>
+                <th class="text-right px-3 py-2 font-medium">Menit</th>
+                <th class="text-left px-3 py-2 font-medium">Jenis</th>
+                <th class="text-left px-3 py-2 font-medium">civil_date</th>
+                <th class="text-left px-3 py-2 font-medium">rate_code</th>
+                <th class="text-left px-3 py-2 font-medium">Cap</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <tr class="bg-gray-50"><td class="px-3 py-2">07:55</td><td class="px-3 py-2">08:00</td><td class="px-3 py-2 text-right">5</td><td class="px-3 py-2"><span class="badge badge-gray">unpaid</span></td><td class="px-3 py-2">28 Sep</td><td class="px-3 py-2 font-mono">UNPAID_EARLY <span class="font-sans text-gray-400">(&lt; blok 30 m)</span></td><td class="px-3 py-2">—</td></tr>
+              <tr><td class="px-3 py-2">08:00</td><td class="px-3 py-2">12:00</td><td class="px-3 py-2 text-right">240</td><td class="px-3 py-2"><span class="badge badge-blue">regular</span></td><td class="px-3 py-2">28 Sep</td><td class="px-3 py-2 font-mono">REG</td><td class="px-3 py-2">—</td></tr>
+              <tr class="bg-gray-50"><td class="px-3 py-2">12:00</td><td class="px-3 py-2">13:00</td><td class="px-3 py-2 text-right">60</td><td class="px-3 py-2"><span class="badge badge-gray">break</span></td><td class="px-3 py-2">28 Sep</td><td class="px-3 py-2 font-mono">UNPAID_BREAK</td><td class="px-3 py-2">—</td></tr>
+              <tr><td class="px-3 py-2">13:00</td><td class="px-3 py-2">17:00</td><td class="px-3 py-2 text-right">240</td><td class="px-3 py-2"><span class="badge badge-blue">regular</span></td><td class="px-3 py-2">28 Sep</td><td class="px-3 py-2 font-mono">REG</td><td class="px-3 py-2">—</td></tr>
+              <tr class="bg-green-50"><td class="px-3 py-2">17:00</td><td class="px-3 py-2">18:00</td><td class="px-3 py-2 text-right">60</td><td class="px-3 py-2"><span class="badge badge-green">ot</span></td><td class="px-3 py-2">28 Sep</td><td class="px-3 py-2 font-mono">OT_WD_1_5</td><td class="px-3 py-2"><span class="badge badge-green">&#10003;</span></td></tr>
+              <tr class="bg-green-50"><td class="px-3 py-2">18:00</td><td class="px-3 py-2">21:00</td><td class="px-3 py-2 text-right">180</td><td class="px-3 py-2"><span class="badge badge-green">ot</span></td><td class="px-3 py-2">28 Sep</td><td class="px-3 py-2 font-mono">OT_WD_2_0</td><td class="px-3 py-2"><span class="badge badge-green">&#10003;</span></td></tr>
+              <tr class="bg-red-50"><td class="px-3 py-2">21:00</td><td class="px-3 py-2">00:00</td><td class="px-3 py-2 text-right">180</td><td class="px-3 py-2"><span class="badge badge-red">ot</span></td><td class="px-3 py-2">28 Sep</td><td class="px-3 py-2 font-mono">OT_OVER_CAP</td><td class="px-3 py-2"><span class="badge badge-red">&#10007;</span></td></tr>
+              <tr class="bg-red-50"><td class="px-3 py-2">00:00</td><td class="px-3 py-2">01:50</td><td class="px-3 py-2 text-right">110</td><td class="px-3 py-2"><span class="badge badge-red">ot</span></td><td class="px-3 py-2"><strong>29 Sep</strong></td><td class="px-3 py-2 font-mono">OT_OVER_CAP</td><td class="px-3 py-2"><span class="badge badge-red">&#10007;</span></td></tr>
+            </tbody>
+            <tfoot class="bg-gray-100 font-semibold">
+              <tr>
+                <td class="px-3 py-2" colspan="2">Total</td>
+                <td class="px-3 py-2 text-right">1.075</td>
+                <td class="px-3 py-2" colspan="4">REG: 480 | OT (cap): 240 | OT (over): 290 | Break: 60 | Unpaid: 5</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- Combined-door session, still open -->
+      <div class="card overflow-hidden mb-4">
+        <div class="p-4 border-b bg-gray-50">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-semibold">Rina Wati — 30 Sep 2026 (Rabu)</h3>
+              <p class="text-xs text-gray-500">Pintu gabungan (Gate Parkir, BOTH) &middot; shift 08:00–17:00 &middot; tanpa kuota lembur</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="badge badge-blue">Open</span>
+              <span class="badge badge-gray">pulang sementara 17:05</span>
+            </div>
+          </div>
+        </div>
+        <div class="p-4">
+          <table class="w-full text-xs">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="text-left px-3 py-2 font-medium">Punch</th>
+                <th class="text-left px-3 py-2 font-medium">Pintu</th>
+                <th class="text-left px-3 py-2 font-medium">Dibaca sebagai</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <tr><td class="px-3 py-2">07:58</td><td class="px-3 py-2 font-mono">both</td><td class="px-3 py-2">IN — membuka sesi</td></tr>
+              <tr><td class="px-3 py-2">12:02</td><td class="px-3 py-2 font-mono">both</td><td class="px-3 py-2 text-gray-400"><s>calon pulang</s> &rarr; digantikan</td></tr>
+              <tr><td class="px-3 py-2">12:51</td><td class="px-3 py-2 font-mono">both</td><td class="px-3 py-2 text-gray-400"><s>calon pulang</s> &rarr; digantikan</td></tr>
+              <tr class="bg-blue-50"><td class="px-3 py-2">17:05</td><td class="px-3 py-2 font-mono">both</td><td class="px-3 py-2"><strong>calon pulang terakhir</strong></td></tr>
+            </tbody>
+          </table>
+          <p class="text-[11px] text-gray-500 mt-3">Sesi ditutup otomatis dengan OUT 17:05 setelah jendela pulang lewat (17:30). Sebelum itu status tetap <span class="font-mono">open</span> supaya punch berikutnya masih bisa menggantikan calon pulang. Keluar makan siang tidak memutus sesi; istirahat 12:00–13:00 dipotong dari jadwal.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== PAYROLL ==================== -->
+    <div id="page-payroll" class="page p-6">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-xl font-bold">Ekspor Payroll</h2>
+          <p class="text-sm text-gray-500 mt-0.5">GET /api/payroll/export — hanya sesi current tanpa exception severity error</p>
+        </div>
+        <div class="flex gap-2">
+          <button class="bg-white border border-gray-300 text-sm px-4 py-2 rounded-lg hover:bg-gray-50">Download CSV</button>
+          <button class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700">Download JSON</button>
+        </div>
+      </div>
+
+      <div class="card p-4 mb-4 bg-yellow-50 border-yellow-200">
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01"/></svg>
+          <p class="text-sm text-yellow-800"><strong>5 sesi ditahan</strong> (<span class="font-mono">held_sessions</span>) karena exception severity error yang belum di-resolve (missing_out, gap_punch). Sesi itu tetap tercantum di file ekspor sebagai &ldquo;ditahan&rdquo;, bukan hilang. Selesaikan di Exception Queue.</p>
+        </div>
+      </div>
+
+      <div class="card overflow-hidden">
+        <table class="w-full text-xs">
+          <thead class="bg-gray-50 text-gray-600">
+            <tr>
+              <th class="text-left px-3 py-2 font-medium">Karyawan</th>
+              <th class="text-left px-3 py-2 font-medium">att_date</th>
+              <th class="text-right px-3 py-2 font-medium">REG</th>
+              <th class="text-right px-3 py-2 font-medium">OT_WD_1_5</th>
+              <th class="text-right px-3 py-2 font-medium">OT_WD_2_0</th>
+              <th class="text-right px-3 py-2 font-medium">OT_OVER_CAP</th>
+              <th class="text-right px-3 py-2 font-medium">BREAK</th>
+              <th class="text-right px-3 py-2 font-medium" title="UNPAID_EARLY, UNPAID_BEFORE_APPROVAL, UNPAID_NO_QUOTA, UNPAID_OVER_QUOTA, UNPAID_BELOW_MIN_BLOCK">Tak dibayar</th>
+              <th class="text-left px-3 py-2 font-medium">Warnings</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr class="table-row">
+              <td class="px-3 py-2 font-medium">Ahmad Rizaldi</td>
+              <td class="px-3 py-2 font-mono">28 Sep</td>
+              <td class="px-3 py-2 text-right">480</td>
+              <td class="px-3 py-2 text-right">60</td>
+              <td class="px-3 py-2 text-right">180</td>
+              <td class="px-3 py-2 text-right text-red-600 font-semibold">290</td>
+              <td class="px-3 py-2 text-right">60</td>
+              <td class="px-3 py-2 text-right text-gray-500" title="UNPAID_EARLY">5</td>
+              <td class="px-3 py-2"><span class="badge badge-yellow">cap_exceeded: 290m</span></td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-3 py-2 font-medium">Siti Nurhaliza</td>
+              <td class="px-3 py-2 font-mono">28 Sep</td>
+              <td class="px-3 py-2 text-right">478</td>
+              <td class="px-3 py-2 text-right">60</td>
+              <td class="px-3 py-2 text-right">180</td>
+              <td class="px-3 py-2 text-right text-red-600">40</td>
+              <td class="px-3 py-2 text-right">60</td>
+              <td class="px-3 py-2 text-right text-gray-500">0</td>
+              <td class="px-3 py-2"><span class="badge badge-yellow">cap_exceeded: 40m</span></td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-3 py-2 font-medium">Siti Nurhaliza</td>
+              <td class="px-3 py-2 font-mono">29 Sep</td>
+              <td class="px-3 py-2 text-right">480</td>
+              <td class="px-3 py-2 text-right">60</td>
+              <td class="px-3 py-2 text-right">180</td>
+              <td class="px-3 py-2 text-right text-red-600">60</td>
+              <td class="px-3 py-2 text-right">60</td>
+              <td class="px-3 py-2 text-right text-gray-500" title="UNPAID_EARLY 2 + UNPAID_OVER_QUOTA 5">7</td>
+              <td class="px-3 py-2"><span class="badge badge-yellow">cap_exceeded: 60m</span></td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-3 py-2 font-medium">Joko Prasetyo</td>
+              <td class="px-3 py-2 font-mono">30 Sep</td>
+              <td class="px-3 py-2 text-right">480</td>
+              <td class="px-3 py-2 text-right">60</td>
+              <td class="px-3 py-2 text-right">0</td>
+              <td class="px-3 py-2 text-right">0</td>
+              <td class="px-3 py-2 text-right">60</td>
+              <td class="px-3 py-2 text-right text-gray-500" title="UNPAID_BEFORE_APPROVAL">90</td>
+              <td class="px-3 py-2"><span class="badge badge-gray">ot_without_quota: 90m</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ==================== EXCEPTIONS ==================== -->
+    <div id="page-exceptions" class="page p-6">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-xl font-bold">Exception Queue</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Antrean pengecualian yang perlu diselesaikan HR</p>
+        </div>
+        <div class="flex gap-2">
+          <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+            <option>Status: Open</option>
+            <option>Status: Resolved</option>
+            <option>Status: Ignored</option>
+            <option>Status: Obsolete</option>
+          </select>
+          <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+            <option>Severity: Semua</option>
+            <option>Error</option>
+            <option>Warning</option>
+            <option>Info</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card overflow-hidden">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 text-gray-600">
+            <tr>
+              <th class="text-left px-4 py-3 font-medium">Severity</th>
+              <th class="text-left px-4 py-3 font-medium">Kode</th>
+              <th class="text-left px-4 py-3 font-medium">Karyawan</th>
+              <th class="text-left px-4 py-3 font-medium">attendance_date</th>
+              <th class="text-left px-4 py-3 font-medium">Detail</th>
+              <th class="text-left px-4 py-3 font-medium">Status</th>
+              <th class="px-4 py-3"></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr class="table-row bg-red-50">
+              <td class="px-4 py-3"><span class="badge badge-red">error</span></td>
+              <td class="px-4 py-3 font-mono text-xs">missing_out</td>
+              <td class="px-4 py-3">Rina Wati</td>
+              <td class="px-4 py-3 font-mono text-xs">29 Sep</td>
+              <td class="px-4 py-3 text-xs text-gray-600">IN 08:02, tidak ada OUT sampai sweeper 17:32. Sesi open yatim.</td>
+              <td class="px-4 py-3"><span class="badge badge-red">Open</span></td>
+              <td class="px-4 py-3">
+                <div class="flex gap-1">
+                  <button class="text-blue-600 text-xs hover:underline">Punch Manual</button>
+                  <button class="text-gray-400 text-xs hover:underline">Resolve</button>
+                </div>
+              </td>
+            </tr>
+            <tr class="table-row bg-red-50">
+              <td class="px-4 py-3"><span class="badge badge-red">error</span></td>
+              <td class="px-4 py-3 font-mono text-xs">unresolved_employee</td>
+              <td class="px-4 py-3 text-gray-400">PIN 9921 (???)</td>
+              <td class="px-4 py-3 font-mono text-xs">30 Sep</td>
+              <td class="px-4 py-3 text-xs text-gray-600">PIN tidak terdaftar di employee_device_identities. Device: ZK-MB460.</td>
+              <td class="px-4 py-3"><span class="badge badge-red">Open</span></td>
+              <td class="px-4 py-3"><button class="text-blue-600 text-xs hover:underline">Map Identity</button></td>
+            </tr>
+            <tr class="table-row bg-red-50">
+              <td class="px-4 py-3"><span class="badge badge-red">error</span></td>
+              <td class="px-4 py-3 font-mono text-xs">gap_punch</td>
+              <td class="px-4 py-3">Budi Santoso</td>
+              <td class="px-4 py-3 font-mono text-xs">29 Sep</td>
+              <td class="px-4 py-3 text-xs text-gray-600">Punch 07:30 jatuh di zona mati (07:16 — 07:44). Kasus C.</td>
+              <td class="px-4 py-3"><span class="badge badge-red">Open</span></td>
+              <td class="px-4 py-3"><button class="text-gray-400 text-xs hover:underline">Resolve</button></td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-4 py-3"><span class="badge badge-yellow">warning</span></td>
+              <td class="px-4 py-3 font-mono text-xs">daily_ot_cap_exceeded</td>
+              <td class="px-4 py-3">Ahmad Rizaldi</td>
+              <td class="px-4 py-3 font-mono text-xs">28 Sep</td>
+              <td class="px-4 py-3 text-xs text-gray-600">Lembur 530 menit, cap 240. Over: 290 menit sebagai OT_OVER_CAP.</td>
+              <td class="px-4 py-3"><span class="badge badge-yellow">Open</span></td>
+              <td class="px-4 py-3"><button class="text-gray-400 text-xs hover:underline">Resolve</button></td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-4 py-3"><span class="badge badge-yellow">warning</span></td>
+              <td class="px-4 py-3 font-mono text-xs">min_rest_violation</td>
+              <td class="px-4 py-3">Budi Santoso</td>
+              <td class="px-4 py-3 font-mono text-xs">28 Sep</td>
+              <td class="px-4 py-3 text-xs text-gray-600">Istirahat rencana 09:00 &rarr; 08:00 = &minus;60 menit (kuota 960 m dianggap dipakai setelah shift). Minimum 1 jam.</td>
+              <td class="px-4 py-3"><span class="badge badge-yellow">Open</span></td>
+              <td class="px-4 py-3"><button class="text-gray-400 text-xs hover:underline">Resolve</button></td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-4 py-3"><span class="badge badge-blue">info</span></td>
+              <td class="px-4 py-3 font-mono text-xs">ot_without_quota</td>
+              <td class="px-4 py-3">Joko Prasetyo</td>
+              <td class="px-4 py-3 font-mono text-xs">30 Sep</td>
+              <td class="px-4 py-3 text-xs text-gray-600">90 menit di luar shift tidak dibayar: kerja sejak 17:00, kuota baru disetujui 18:30 (<span class="font-mono">UNPAID_BEFORE_APPROVAL</span>). Untuk supervisor.</td>
+              <td class="px-4 py-3"><span class="badge badge-blue">Open</span></td>
+              <td class="px-4 py-3"><button class="text-gray-400 text-xs hover:underline">Resolve</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+}
+</script>
+</body>
+</html>
