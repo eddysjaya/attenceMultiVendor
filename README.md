@@ -40,7 +40,7 @@ Uji basis data membuat database sementara per kelas uji lalu menghapusnya. Tanpa
 | `ATTENDANCE_TEST_PG_USER` | role dengan hak `CREATEDB` |
 | `ATTENDANCE_TEST_PG_PASSWORD` | |
 
-Di server dev (`10.100.0.67`), uji lengkap dijalankan di container Maven terhadap PostgreSQL host:
+Di server dev, uji lengkap dijalankan di container Maven terhadap PostgreSQL host:
 
 ```bash
 set -a; . ~/.attendance-dev.env; set +a
